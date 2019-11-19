@@ -132,7 +132,7 @@ export const constantRoutes = [
       },
       {
         path: '/cards/create',
-        component: () => import('@/views/cards/index'),
+        component: () => import('@/views/cards/createorEdit.vue'),
         name: 'Add Card',
         meta: { title: 'Add Card', icon: 'guide', noCache: true },
       },
@@ -145,7 +145,7 @@ export const constantRoutes = [
       },
       {
         path: '/cards/edit/:id',
-        component: () => import('@/views/cards/index'),
+        component: () => import('@/views/cards/createorEdit.vue'),
         name: 'Edit Card',
         hidden: true,
         meta: { title: 'Edit Card', icon: 'guide', noCache: true },

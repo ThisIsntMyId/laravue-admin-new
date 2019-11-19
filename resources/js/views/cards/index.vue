@@ -109,7 +109,7 @@ export default {
       this.$router.push(`/cards/view/${data.id}`);
     },
     handleEdit(index, data){
-
+      this.$router.push(`/cards/edit/${data.id}`);
     },
     handleDelete(index, data){
 
