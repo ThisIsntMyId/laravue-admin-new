@@ -105,14 +105,21 @@ export default {
     async updateCardsList(object) {
       await this.getCardsData({ page: object.page, limit: object.limit });
     },
-    handleView(index, data){
+    handleView(index, data) {
       this.$router.push(`/cards/view/${data.id}`);
     },
-    handleEdit(index, data){
+    handleEdit(index, data) {
       this.$router.push(`/cards/edit/${data.id}`);
     },
-    handleDelete(index, data){
-
+    handleDelete(index, data) {
+      CardResource.destroy(data.id)
+        .then(res => {
+          this.$message.success('Card Deleted Successfully');
+          this.getCardsData({ page: this.paginationDetails.currentPage });
+        })
+        .error(err => {
+          this.$message.error(err);
+        });
     },
   },
 };
