@@ -118,6 +118,18 @@ export const constantRoutes = [
       },
     ],
   },
+  {
+    path: '/cards',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/cards/index'),
+        name: 'Cards',
+        meta: { title: 'Cards', icon: 'guide', noCache: true },
+      },
+    ],
+  },
   elementUiRoutes,
 ];
 

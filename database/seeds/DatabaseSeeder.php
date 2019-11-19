@@ -50,6 +50,10 @@ class DatabaseSeeder extends Seeder
         $editor->syncRoles($editorRole);
         $user->syncRoles($userRole);
         $visitor->syncRoles($visitorRole);
-        $this->call(UsersTableSeeder::class);
+        $this->call([
+            UsersTableSeeder::class,
+            CategoriessTableSeeder::class,
+            CardsTableSeeder::class,
+        ]);
     }
 }
