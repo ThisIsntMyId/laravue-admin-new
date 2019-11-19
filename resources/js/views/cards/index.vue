@@ -105,6 +105,15 @@ export default {
     async updateCardsList(object) {
       await this.getCardsData({ page: object.page, limit: object.limit });
     },
+    handleView(index, data){
+      this.$router.push(`/cards/view/${data.id}`);
+    },
+    handleEdit(index, data){
+
+    },
+    handleDelete(index, data){
+
+    },
   },
 };
 </script>

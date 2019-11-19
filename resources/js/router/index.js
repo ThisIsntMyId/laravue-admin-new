@@ -120,13 +120,35 @@ export const constantRoutes = [
   },
   {
     path: '/cards',
+    redirect: '/cards/index',
     component: Layout,
+    meta: { title: 'Cards', icon: 'role' },
     children: [
       {
         path: 'index',
         component: () => import('@/views/cards/index'),
-        name: 'Cards',
-        meta: { title: 'Cards', icon: 'guide', noCache: true },
+        name: 'Cards List',
+        meta: { title: 'Cards List', icon: 'guide', noCache: true },
+      },
+      {
+        path: '/cards/create',
+        component: () => import('@/views/cards/index'),
+        name: 'Add Card',
+        meta: { title: 'Add Card', icon: 'guide', noCache: true },
+      },
+      {
+        path: '/cards/view/:id',
+        component: () => import('@/views/cards/view.vue'),
+        name: 'View Card',
+        hidden: true,
+        meta: { title: 'View Card', icon: 'guide', noCache: true },
+      },
+      {
+        path: '/cards/edit/:id',
+        component: () => import('@/views/cards/index'),
+        name: 'Edit Card',
+        hidden: true,
+        meta: { title: 'Edit Card', icon: 'guide', noCache: true },
       },
     ],
   },
