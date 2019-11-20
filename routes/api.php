@@ -27,6 +27,7 @@ Route::group(['middleware' => 'api'], function () {
     });
 
     Route::apiResource('cards', 'CardController');
+    Route::delete('deletemanycards', 'CardController@deletemany');
     Route::apiResource('categories', 'CategoryController');
 
     Route::apiResource('users', 'UserController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);

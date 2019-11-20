@@ -29,7 +29,19 @@
           <el-dropdown-item command="selectedCsv">Export selected to csv</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
-      <el-button class="filter-item" type="danger">delete selected</el-button>
+      <el-button
+        class="filter-item"
+        type="danger"
+        icon="el-icon-delete"
+        @click="clearSelected"
+      >Clear Selection</el-button>
+      <el-button
+        v-loading="loading.deleteSelected"
+        class="filter-item"
+        type="danger"
+        icon="el-icon-delete"
+        @click="handleDeleteSelected"
+      >Delete Selected</el-button>
     </div>
     <el-row>
       <el-table
@@ -83,8 +95,7 @@
 <script>
 import Pagination from '@/components/Pagination';
 import Resource from '@/api/resource';
-// import exportWithFieldsToExcel from './exportToExcel';
-// import axios from 'axios';
+import axios from 'axios';
 const CardResource = new Resource('cards');
 const CategoryResource = new Resource('categories');
 
@@ -105,6 +116,7 @@ export default {
       loading: {
         cardsData: false,
         exportLoader: false,
+        deleteSelected: false,
       },
     };
   },
@@ -123,10 +135,10 @@ export default {
         card['category'] = this.getCategoryName(card.category);
       }
       // TODO: Remember to clean this
-      this.paginationDetails.totalCards = data.total;
-      this.paginationDetails.currentPage = data.current_page;
-      this.paginationDetails.totalPages = data.last_page;
-      this.paginationDetails.limit = data.per_page;
+      this.paginationDetails.totalCards = parseInt(data.total);
+      this.paginationDetails.currentPage = parseInt(data.current_page);
+      this.paginationDetails.totalPages = parseInt(data.last_page);
+      this.paginationDetails.limit = parseInt(data.per_page);
       this.loading.cardsData = false;
     },
     async getCardCategories() {
@@ -157,6 +169,32 @@ export default {
     },
     handleSelectionChange(selection) {
       this.selectedCards = selection;
+    },
+    clearSelected() {
+      this.$refs['cardsTable'].clearSelection();
+    },
+    // FIXME: Its lagging a bit
+    handleDeleteSelected() {
+      this.loading.deleteSelected = true;
+      if (this.selectedCards.length <= 0) {
+        this.$message.error('Please select some fields');
+      } else {
+        const ids = this.selectedCards.map(cards => cards.id);
+        axios
+          .delete('/api/deletemanycards', { data: { ids: ids }})
+          .then(async res => {
+            this.$message.success('Delete success Full');
+            await this.getCardsData({
+              page: this.paginationDetails.currentPage,
+            });
+            if (this.cardsData.length === 0) {
+              await this.getCardsData({
+                page: this.paginationDetails.currentPage - 1,
+              });
+            }
+          });
+      }
+      this.loading.deleteSelected = false;
     },
     async handleExport(command) {
       // ! Data provided here is not filtered for csv, i.e. ',' are not removed

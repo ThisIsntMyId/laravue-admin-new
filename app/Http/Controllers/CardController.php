@@ -105,4 +105,18 @@ class CardController extends Controller
 
         return response()->json(null, 204);
     }
+
+    /**
+     * Remove the multiple resource from storage.
+     *
+     * @param  \App\Laravue\Models\Card  $card
+     * @return \Illuminate\Http\Response
+     */
+    public function deletemany(Request $request)
+    {
+        $ids = $request->input('ids');
+        Card::destroy($ids);
+        dd($ids);
+        return response()->json(null, 204);
+    }
 }
