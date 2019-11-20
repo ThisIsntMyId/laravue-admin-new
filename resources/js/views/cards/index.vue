@@ -51,9 +51,10 @@
         style="width: 100%"
         border
         height="540px"
+        :row-key="getRowKeys"
         @selection-change="handleSelectionChange"
       >
-        <el-table-column type="selection" width="55" />
+        <el-table-column type="selection" width="55" reserve-selection />
         <el-table-column prop="name" label="Name" sortable />
         <el-table-column prop="description" label="Description" show-overflow-tooltip sortable />
         <el-table-column prop="price" label="Price" width="100" sortable />
@@ -172,6 +173,9 @@ export default {
     },
     clearSelected() {
       this.$refs['cardsTable'].clearSelection();
+    },
+    getRowKeys(row) {
+      return row.id;
     },
     // FIXME: Its lagging a bit
     handleDeleteSelected() {
