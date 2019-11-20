@@ -53,12 +53,19 @@
         height="540px"
         :row-key="getRowKeys"
         @selection-change="handleSelectionChange"
+        @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="55" reserve-selection />
-        <el-table-column prop="name" label="Name" sortable />
-        <el-table-column prop="description" label="Description" show-overflow-tooltip sortable />
-        <el-table-column prop="price" label="Price" width="100" sortable />
-        <el-table-column prop="category" label="Category" sortable />
+        <el-table-column prop="name" label="Name" sortable="custom" />
+        <el-table-column
+          prop="description"
+          label="Description"
+          show-overflow-tooltip
+          sortable="custom"
+        />
+        <el-table-column prop="price" label="Price" width="100" sortable="custom" />
+        <!-- ? Remember to use formater attribute to display the category name -->
+        <el-table-column prop="category" label="Category" sortable="custom" />
         <el-table-column label="Operations">
           <template slot-scope="scope">
             <el-button
@@ -113,6 +120,10 @@ export default {
         currentPage: 0,
         limit: 0,
       },
+      currentSort: {
+        field: '',
+        order: 'asc',
+      },
       selectedCards: [],
       loading: {
         cardsData: false,
@@ -150,7 +161,12 @@ export default {
     },
     // ? Pagination Methods
     async updateCardsList(object) {
-      await this.getCardsData({ page: object.page, limit: object.limit });
+      await this.getCardsData({
+        page: object.page,
+        limit: object.limit,
+        sort: this.currentSort.field,
+        'sort-order': this.currentSort.order,
+      });
     },
     handleView(index, data) {
       this.$router.push(`/cards/view/${data.id}`);
@@ -176,6 +192,21 @@ export default {
     },
     getRowKeys(row) {
       return row.id;
+    },
+    // ? method to handle and get sorted fields from backend
+    async handleSortChange(change) {
+      this.currentSort.field = change.prop;
+      if (change.order === 'ascending') {
+        this.currentSort.order = 'asc';
+      } else if (change.order === 'descending') {
+        this.currentSort.order = 'desc';
+      }
+      await this.getCardsData({
+        page: this.paginationDetails.currentPage,
+        limit: this.paginationDetails.limit,
+        sort: this.currentSort.field,
+        'sort-order': this.currentSort.order,
+      });
     },
     // FIXME: Its lagging a bit
     handleDeleteSelected() {

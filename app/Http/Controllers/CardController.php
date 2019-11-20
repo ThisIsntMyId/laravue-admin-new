@@ -35,8 +35,13 @@ class CardController extends Controller
     public function index(Request $request)
     {
         $limit = $request->query('limit');
-        if($limit && $limit == -1){
+        if ($limit && $limit == -1) {
             return card::all();
+        }
+        $sort_field = $request->query('sort');
+        $sort_mode = $request->query('sort-order');
+        if ($sort_field) {
+            return Card::orderBy($sort_field, strtolower($sort_mode ?? 'ASC'))->paginate($limit ?? 10);
         }
         return Card::paginate($limit ?? 10);
     }
