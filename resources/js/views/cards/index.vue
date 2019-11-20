@@ -1,6 +1,23 @@
 <template>
   <div class="app-container">
-    <h1 style="margin-bottom: 0;">Cards</h1>
+    <div class="filter-container">
+      <el-input
+        class="filter-item"
+        style="width:200px; margin-right: 10px;"
+        placeholder="Search"
+        prefix-icon="el-icon-search"
+      />
+      <el-button class="filter-item" type="primary">import</el-button>
+      <el-button
+        class="filter-item"
+        type="primary"
+        :loading="loading.exportLoader"
+        icon="el-icon-download"
+        @click="handleExport"
+      >Export</el-button>
+      <el-button class="filter-item" type="primary">export selected</el-button>
+      <el-button class="filter-item" type="danger">delete selected</el-button>
+    </div>
     <el-row>
       <el-table
         ref="cardsTable"
@@ -53,6 +70,7 @@
 <script>
 import Pagination from '@/components/Pagination';
 import Resource from '@/api/resource';
+// import exportWithFieldsToExcel from './exportToExcel';
 // import axios from 'axios';
 const CardResource = new Resource('cards');
 const CategoryResource = new Resource('categories');
@@ -73,6 +91,8 @@ export default {
       selectedCards: [],
       loading: {
         cardsData: false,
+        exportLoader: false,
+        exportSelectedLoader: false,
       },
     };
   },
@@ -87,9 +107,10 @@ export default {
       const data = await CardResource.list(query);
       this.cardsData = data.data;
       for (const card of this.cardsData) {
+        // TODO: Fix card data should hold category id not category name so that the id can be reused at some other place while where name is required it should be processed
         card['category'] = this.getCategoryName(card.category);
       }
-      // Todo: Remember to clean this
+      // TODO: Remember to clean this
       this.paginationDetails.totalCards = data.total;
       this.paginationDetails.currentPage = data.current_page;
       this.paginationDetails.totalPages = data.last_page;
@@ -124,6 +145,23 @@ export default {
     },
     handleSelectionChange(selection) {
       this.selectedCards = selection;
+    },
+    handleExport() {
+      const header = ['Name', 'Description', 'Price', 'Category'];
+      const fields = ['name', 'description', 'price', 'category'];
+      const data = this.cardsData;
+      console.log(data);
+      import('./exportToExcel').then(excel => {
+        alert();
+        console.log(excel);
+        excel.exportWithFieldsToExcel(
+          fields,
+          header,
+          this.cardsData,
+          'CardsData.csv',
+          this.loading.exportLoader
+        );
+      });
     },
   },
 };
