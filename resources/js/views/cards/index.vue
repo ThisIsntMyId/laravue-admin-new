@@ -8,14 +8,27 @@
         prefix-icon="el-icon-search"
       />
       <el-button class="filter-item" type="primary">import</el-button>
-      <el-button
+      <el-dropdown
+        v-loading="loading.exportLoader"
         class="filter-item"
-        type="primary"
-        :loading="loading.exportLoader"
-        icon="el-icon-download"
-        @click="handleExport"
-      >Export</el-button>
-      <el-button class="filter-item" type="primary">export selected</el-button>
+        style="margin-right: 10px; margin-left: 10px;"
+        @command="handleExport"
+      >
+        <span class="el-dropdown-link">
+          <el-button type="primary" icon="el-icon-download">
+            Export
+            <i class="el-icon-caret-bottom" />
+          </el-button>
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item command="allExcel">Export all to excel</el-dropdown-item>
+          <el-dropdown-item command="currentExcel">Export current page to excel</el-dropdown-item>
+          <el-dropdown-item command="selectedExcel">Export selected to excel</el-dropdown-item>
+          <el-dropdown-item command="allCsv" divided>Export all to csv</el-dropdown-item>
+          <el-dropdown-item command="currentCsv">Export current page to csv</el-dropdown-item>
+          <el-dropdown-item command="selectedCsv">Export selected to csv</el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
       <el-button class="filter-item" type="danger">delete selected</el-button>
     </div>
     <el-row>
@@ -92,7 +105,6 @@ export default {
       loading: {
         cardsData: false,
         exportLoader: false,
-        exportSelectedLoader: false,
       },
     };
   },
@@ -146,22 +158,103 @@ export default {
     handleSelectionChange(selection) {
       this.selectedCards = selection;
     },
-    handleExport() {
-      const header = ['Name', 'Description', 'Price', 'Category'];
-      const fields = ['name', 'description', 'price', 'category'];
-      const data = this.cardsData;
-      console.log(data);
-      import('./exportToExcel').then(excel => {
-        alert();
-        console.log(excel);
-        excel.exportWithFieldsToExcel(
-          fields,
-          header,
-          this.cardsData,
-          'CardsData.csv',
-          this.loading.exportLoader
-        );
-      });
+    async handleExport(command) {
+      // ! Data provided here is not filtered for csv, i.e. ',' are not removed
+      // TODO: Remove inline imports and shift import to the top
+      // TODO: clean this function and make it DRY
+      this.loading.exportLoader = true;
+      switch (command) {
+        case 'allExcel': {
+          const header = ['Id', 'Name', 'Description', 'Price', 'Category'];
+          const fields = ['id', 'name', 'description', 'price', 'category'];
+          const data = await CardResource.list({ limit: -1 });
+          for (const card of data) {
+            card.category = this.getCategoryName(card.category);
+          }
+          console.log(data);
+          import('./exports').then(excel => {
+            console.log(excel);
+            excel.exportWithFieldsToExcel(fields, header, data, 'AllCardsData');
+          });
+          break;
+        }
+        case 'currentExcel': {
+          const header = ['Id', 'Name', 'Description', 'Price', 'Category'];
+          const fields = ['id', 'name', 'description', 'price', 'category'];
+          const data = this.cardsData;
+          console.log(data);
+          import('./exports').then(excel => {
+            console.log(excel);
+            excel.exportWithFieldsToExcel(fields, header, data, 'CardsData');
+          });
+          break;
+        }
+        // TODO: Make this work for selected data from multiple pages
+        case 'selectedExcel': {
+          const header = ['Id', 'Name', 'Description', 'Price', 'Category'];
+          const fields = ['id', 'name', 'description', 'price', 'category'];
+          const data = this.selectedCards;
+          console.log(data);
+          import('./exports').then(excel => {
+            console.log(excel);
+            excel.exportWithFieldsToExcel(
+              fields,
+              header,
+              data,
+              'SelectedCardsData'
+            );
+          });
+          break;
+        }
+        case 'allCsv': {
+          // TODO: can maek the header and fields fields out of this object
+          const headers = {
+            id: 'Id',
+            name: 'Name',
+            description: 'Description',
+            price: 'Price',
+            category: 'Category',
+          };
+          const data = await CardResource.list({ limit: -1 });
+          for (const card of data) {
+            card.category = this.getCategoryName(card.category);
+          }
+          import('./exports').then(csv => {
+            csv.exportCSVFile(headers, data, 'AllCardsData');
+          });
+          break;
+        }
+        case 'currentCsv': {
+          const headers = {
+            id: 'Id',
+            name: 'Name',
+            description: 'Description',
+            price: 'Price',
+            category: 'Category',
+          };
+          const data = this.cardsData;
+          import('./exports').then(csv => {
+            csv.exportCSVFile(headers, data, 'CardsData');
+          });
+          break;
+        }
+        // TODO: Make this work for selected data from multiple pages
+        case 'selectedCsv': {
+          const headers = {
+            id: 'Id',
+            name: 'Name',
+            description: 'Description',
+            price: 'Price',
+            category: 'Category',
+          };
+          const data = this.selectedCards;
+          import('./exports').then(csv => {
+            csv.exportCSVFile(headers, data, 'CardsData');
+          });
+          break;
+        }
+      }
+      this.loading.exportLoader = false;
     },
   },
 };

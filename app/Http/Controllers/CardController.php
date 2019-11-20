@@ -35,6 +35,9 @@ class CardController extends Controller
     public function index(Request $request)
     {
         $limit = $request->query('limit');
+        if($limit && $limit == -1){
+            return card::all();
+        }
         return Card::paginate($limit ?? 10);
     }
 
