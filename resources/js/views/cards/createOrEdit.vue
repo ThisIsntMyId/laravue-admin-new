@@ -2,15 +2,42 @@
   <div class="app-container">
     <el-form ref="form" v-loading="loading.cardData" :model="formData" :rules="validationRules">
       <el-form-item label="Name" prop="name">
+        <el-tooltip class="item" effect="dark" content="Name of the card." placement="right">
+          <i class="el-icon-info" />
+        </el-tooltip>
         <el-input v-model="formData.name" />
       </el-form-item>
       <el-form-item label="Description" prop="description">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="Some nice and long description about the card."
+          placement="right"
+        >
+          <i class="el-icon-info" />
+        </el-tooltip>
         <el-input v-model="formData.description" type="textarea" />
       </el-form-item>
       <el-form-item label="Price" prop="price">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="How much does the card cost."
+          placement="right"
+        >
+          <i class="el-icon-info" />
+        </el-tooltip>
         <el-input v-model="formData.price" />
       </el-form-item>
       <el-form-item label="Category" prop="category">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="Which Category does the card belongs to."
+          placement="bottom"
+        >
+          <i class="el-icon-info" />
+        </el-tooltip>
         <el-select v-model="formData.category" placeholder="please choose a category">
           <el-option
             v-for="category in categories"
@@ -157,4 +184,8 @@ export default {
 </script>
 
 <style scoped>
+.el-tooltip.el-icon-info {
+    position: relative;
+    left: -8px;
+}
 </style>

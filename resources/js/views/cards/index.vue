@@ -65,11 +65,12 @@ export default {
       cardsData: [],
       categories: [],
       paginationDetails: {
-        totalCards: '',
-        totalPages: '',
-        currentPage: '',
-        limit: '',
+        totalCards: 0,
+        totalPages: 0,
+        currentPage: 0,
+        limit: 0,
       },
+      selectedCards: [],
       loading: {
         cardsData: false,
       },
@@ -120,6 +121,9 @@ export default {
         .error(err => {
           this.$message.error(err);
         });
+    },
+    handleSelectionChange(selection) {
+      this.selectedCards = selection;
     },
   },
 };
