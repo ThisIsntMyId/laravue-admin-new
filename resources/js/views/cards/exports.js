@@ -45,7 +45,7 @@ export function formatJson(filterVal, jsonData) {
   );
 }
 
-export function exportWithFieldsToExcel(fields, header, dataToBeExported, filename, loader = '') {
+export function exportWithFieldsToExcel(header, fields, dataToBeExported, filename, loader = '') {
   loader = true;
   import('@/vendor/Export2Excel').then(exportToExcel => {
     const data = formatJson(fields, dataToBeExported);
@@ -76,17 +76,22 @@ export function convertToCSV(objArray) {
   return str;
 }
 
-export function exportCSVFile(headers, items, fileTitle) {
+export function exportCSVFile(header, fields, items, fileTitle) {
+  const headersObj = {};
+  for (const index in fields) {
+    headersObj[fields[index]] = header[index] || fields[index];
+  }
+
   // ? filter items fields according to header
   const filteredItems = items.map(item => {
     const localCard = {};
-    for (const field in headers) {
+    for (const field of fields) {
       localCard[field] = item[field];
     }
     return localCard;
   });
-  if (headers) {
-    filteredItems.unshift(headers);
+  if (headersObj) {
+    filteredItems.unshift(headersObj);
   }
   // Convert Object to JSON
   var jsonObject = JSON.stringify(filteredItems);
