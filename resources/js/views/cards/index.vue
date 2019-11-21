@@ -69,9 +69,22 @@
           show-overflow-tooltip
           sortable="custom"
         />
-        <el-table-column prop="price" label="Price" width="100" sortable="custom" />
+        <el-table-column
+          prop="price"
+          label="Price"
+          width="100"
+          sortable="custom"
+          :filters="filters.price"
+          :filter-method="handlePriceFilter"
+        />
         <!-- ? Remember to use formater attribute to display the category name -->
-        <el-table-column prop="category" label="Category" sortable="custom" />
+        <el-table-column
+          prop="category"
+          label="Category"
+          sortable="custom"
+          :filters="categoryFilterValues"
+          :filter-method="handleCategoryFilter"
+        />
         <el-table-column label="Operations">
           <template slot-scope="scope">
             <el-button
@@ -132,6 +145,27 @@ export default {
         order: 'asc',
       },
       selectedCards: [],
+      filters: {
+        price: [
+          {
+            text: '0-2500 Rs',
+            value: { min: 0, max: 2500 },
+          },
+          {
+            text: '2500-5000 Rs',
+            value: { min: 2500, max: 5000 },
+          },
+          {
+            text: '5000-7500 Rs',
+            value: { min: 5000, max: 7500 },
+          },
+          {
+            text: '7500-10000 Rs',
+            value: { min: 7500, max: 10000 },
+          },
+        ],
+        category: this.categoryFilterValues,
+      },
       loading: {
         cardsData: false,
         exportLoader: false,
@@ -139,6 +173,16 @@ export default {
       },
       showId: false,
     };
+  },
+  computed: {
+    categoryFilterValues() {
+      return this.categories.map(cat => {
+        return {
+          text: cat.name,
+          value: cat.name,
+        };
+      });
+    },
   },
   async created() {
     await this.getCardCategories();
@@ -264,6 +308,12 @@ export default {
         exportCSVFile(header, fields, data, fileName);
       }
       this.loading.exportLoader = false;
+    },
+    handlePriceFilter(value, row, column) {
+      return value.max > row.price && row.price >= value.min;
+    },
+    handleCategoryFilter(value, row, column) {
+      return value === row.category;
     },
   },
 };
