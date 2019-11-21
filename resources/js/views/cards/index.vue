@@ -42,6 +42,11 @@
         icon="el-icon-delete"
         @click="handleDeleteSelected"
       >Delete Selected</el-button>
+      <el-checkbox
+        v-model="showId"
+        class="filter-item"
+        style="margin-right: 10px; margin-left: 10px;"
+      >Show Id</el-checkbox>
     </div>
     <el-row>
       <el-table
@@ -50,12 +55,13 @@
         :data="cardsData"
         style="width: 100%"
         border
-        height="540px"
+        height="545px"
         :row-key="getRowKeys"
         @selection-change="handleSelectionChange"
         @sort-change="handleSortChange"
       >
         <el-table-column type="selection" width="55" reserve-selection />
+        <el-table-column v-if="showId" prop="id" label="id" width="70" sortable />
         <el-table-column prop="name" label="Name" sortable="custom" />
         <el-table-column
           prop="description"
@@ -131,6 +137,7 @@ export default {
         exportLoader: false,
         deleteSelected: false,
       },
+      showId: false,
     };
   },
   async created() {
@@ -234,8 +241,6 @@ export default {
     },
     async handleExport(command) {
       // ! Data provided here is not filtered for csv, i.e. ',' are not removed
-      // TODO: Remove inline imports and shift import to the top
-      // TODO: clean this function and make it DRY
       this.loading.exportLoader = true;
       const fileName = 'CardsData';
       const header = ['Id', 'Name', 'Description', 'Price', 'Category'];
