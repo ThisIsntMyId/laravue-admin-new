@@ -62,7 +62,7 @@
       >
         <el-table-column type="selection" width="55" reserve-selection />
         <el-table-column v-if="showId" prop="id" label="id" width="70" sortable />
-        <el-table-column prop="name" label="Name" sortable="custom" />
+        <el-table-column prop="name" label="Name" :render-header="renderNameHeader" />
         <el-table-column
           prop="description"
           label="Description"
@@ -166,12 +166,14 @@ export default {
         ],
         category: this.categoryFilterValues,
       },
+      search: '123',
       loading: {
         cardsData: false,
         exportLoader: false,
         deleteSelected: false,
       },
       showId: false,
+      popoverVisible: false,
     };
   },
   computed: {
@@ -189,6 +191,31 @@ export default {
     await this.getCardsData({ page: 1 });
   },
   methods: {
+    renderNameHeader(h, { column, $index }) {
+      return h('span', [
+        column.label,
+        h(
+          'el-popover',
+          {
+            props: {
+              placement: 'top',
+              trigger: 'click',
+              content: column.label,
+            },
+          },
+          [
+            h(
+              'i',
+              {
+                slot: 'reference',
+                class: 'el-icon-info',
+              },
+              ''
+            ),
+          ]
+        ),
+      ]);
+    },
     // ? Methods to get Cards and Categories
     async getCardsData(query) {
       this.loading.cardsData = true;
@@ -309,6 +336,7 @@ export default {
       }
       this.loading.exportLoader = false;
     },
+    // ? Filter Methods
     handlePriceFilter(value, row, column) {
       return value.max > row.price && row.price >= value.min;
     },
