@@ -165,7 +165,10 @@ export default {
           },
         ],
         category: this.categoryFilterValues,
+        name: '',
+        description: '',
       },
+      unfilteredData: [], // ? Temporary to store previous data to revert to unfiltered values locally
       search: '123',
       loading: {
         cardsData: false,
@@ -215,12 +218,50 @@ export default {
               }}
             ></i>
           </span>
-          <el-popover placement='bottom' transition='el-zoom-in-top' trigger='click' content={column.label}>
-            <el-input placeholder='Enter Text Here' prefix-icon='search' />
-            <span class='el-table__column-filter-trigger' slot='reference'><i class='el-icon-arrow-down'></i></span>
+          <el-popover
+            class='custom-filter'
+            placement='bottom'
+            transition='el-zoom-in-top'
+            trigger='click'
+            content={column.label}
+          >
+            <div style='padding: 12px;'>
+              <el-input
+                placeholder='Enter Text Here'
+                prefix-icon='el-icon-search'
+                value={this.filters[column.property]}
+                onInput={e => (this.filters[column.property] = e)}
+              />
+            </div>
+            <div class='el-table-filter__bottom'>
+              <button
+                type='text'
+                disabled={this.filters[column.property].length <= 0}
+                class={this.filters[column.property] ? '' : 'is-disabled'}
+                on-click={$event => {
+                  this.handleCustomFilterConfirm(column.property);
+                }}
+              >
+                Confirm
+              </button>
+              <button
+                type='text'
+                on-click={$event => {
+                  this.handleCustomFilterReset(column.property);
+                }}
+              >
+                Reset
+              </button>
+            </div>
+            <span class='el-table__column-filter-trigger' slot='reference'>
+              <i class='el-icon-arrow-down'></i>
+            </span>
           </el-popover>
         </span>
       );
+    },
+    alertMethod(val = 'nul') {
+      alert(val);
     },
     // ? Methods to get Cards and Categories
     async getCardsData(query) {
@@ -364,12 +405,38 @@ export default {
     handleCategoryFilter(value, row, column) {
       return value === row.category;
     },
+    handleCustomFilterConfirm(colName) {
+      // TODO: Make press enter to search, whenever clicked outside popover should be disabled
+      this.unfilteredData = this.cardsData;
+      this.cardsData = this.cardsData.filter(card =>
+        card[colName]
+          .toLowerCase()
+          .includes(this.filters[colName].toLowerCase())
+      );
+    },
+    handleCustomFilterReset(colName) {
+      this.filters[colName] = '';
+      if (this.unfilteredData.length > 0) {
+        this.cardsData = this.unfilteredData;
+        this.unfilteredData = '';
+      }
+      // TODO: To unfilter the data locally and globally
+    },
   },
 };
 </script>
 
-<style scoped>
+// FIXME: Scoped styles are not working
+<style>
 .pagination-container {
   margin: 0;
+}
+.el-popover {
+  padding: 0;
+  border-radius: 0;
+}
+
+.el-popover .popper-arrow {
+  display: none;
 }
 </style>
