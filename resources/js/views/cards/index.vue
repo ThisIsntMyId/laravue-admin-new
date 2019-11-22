@@ -59,15 +59,22 @@
         :row-key="getRowKeys"
         @selection-change="handleSelectionChange"
         @sort-change="handleSortChange"
+        @filter-change="handleGlobalFilterChange"
       >
         <el-table-column type="selection" width="55" reserve-selection />
-        <el-table-column v-if="showId" prop="id" label="id" width="70" sortable />
-        <el-table-column prop="name" label="Name" :render-header="renderNameHeader" />
+        <el-table-column v-if="showId" prop="id" label="id" width="70" sortable column-key="id" />
+        <el-table-column
+          prop="name"
+          label="Name"
+          :render-header="renderNameHeader"
+          column-key="name"
+        />
         <el-table-column
           prop="description"
           label="Description"
           show-overflow-tooltip
           :render-header="renderNameHeader"
+          column-key="description"
         />
         <el-table-column
           prop="price"
@@ -76,6 +83,7 @@
           sortable="custom"
           :filters="filters.price"
           :filter-method="handlePriceFilter"
+          column-key="price"
         />
         <!-- ? Remember to use formater attribute to display the category name -->
         <el-table-column
@@ -84,6 +92,7 @@
           sortable="custom"
           :filters="categoryFilterValues"
           :filter-method="handleCategoryFilter"
+          column-key="category"
         />
         <el-table-column label="Operations">
           <template slot-scope="scope">
@@ -168,6 +177,7 @@ export default {
         name: '',
         description: '',
       },
+      filterParams: {},
       unfilteredData: [], // ? Temporary to store previous data to revert to unfiltered values locally
       search: '123',
       loading: {
@@ -239,7 +249,7 @@ export default {
                 disabled={this.filters[column.property].length <= 0}
                 class={this.filters[column.property] ? '' : 'is-disabled'}
                 on-click={$event => {
-                  this.handleCustomFilterConfirm(column.property);
+                  this.handleCustomFilterConfirm(column.property, column);
                 }}
               >
                 Confirm
@@ -247,7 +257,7 @@ export default {
               <button
                 type='text'
                 on-click={$event => {
-                  this.handleCustomFilterReset(column.property);
+                  this.handleCustomFilterReset(column.property, column);
                 }}
               >
                 Reset
@@ -320,6 +330,7 @@ export default {
       return row.id;
     },
     // ? method to handle and get sorted fields from backend
+    // FIXME: Only change the color of the icon that has been changed and revert color of all other icons
     async handleSortChange(change) {
       this.currentSort.field = change.prop;
       if (change.order === 'ascending') {
@@ -405,22 +416,37 @@ export default {
     handleCategoryFilter(value, row, column) {
       return value === row.category;
     },
-    handleCustomFilterConfirm(colName) {
+    handleCustomFilterConfirm(colName, column) {
       // TODO: Make press enter to search, whenever clicked outside popover should be disabled
       this.unfilteredData = this.cardsData;
+      column.filteredValue = this.filters[column.property];
+      this.$refs['cardsTable'].$emit('filter-change', {
+        [colName]: this.filters[colName],
+      });
+      this.filterParams[colName] = this.filters[colName];
+      // ? Call the server here for filtered data
       this.cardsData = this.cardsData.filter(card =>
         card[colName]
           .toLowerCase()
           .includes(this.filters[colName].toLowerCase())
       );
     },
-    handleCustomFilterReset(colName) {
+    handleCustomFilterReset(colName, column) {
       this.filters[colName] = '';
+      column.filteredValue = [];
       if (this.unfilteredData.length > 0) {
         this.cardsData = this.unfilteredData;
         this.unfilteredData = '';
       }
       // TODO: To unfilter the data locally and globally
+    },
+    handleGlobalFilterChange(filters) {
+      console.log(filters);
+      console.log(this.$refs['cardsTable']);
+      // for(let field in filters){
+      //   console.log(field);
+      //   this.filterParams[field] = filters[field];
+      // }
     },
   },
 };
