@@ -67,7 +67,7 @@
           prop="description"
           label="Description"
           show-overflow-tooltip
-          sortable="custom"
+          :render-header="renderNameHeader"
         />
         <el-table-column
           prop="price"
@@ -192,29 +192,35 @@ export default {
   },
   methods: {
     renderNameHeader(h, { column, $index }) {
-      return h('span', [
-        column.label,
-        h(
-          'el-popover',
-          {
-            props: {
-              placement: 'top',
-              trigger: 'click',
-              content: column.label,
-            },
-          },
-          [
-            h(
-              'i',
-              {
-                slot: 'reference',
-                class: 'el-icon-info',
-              },
-              ''
-            ),
-          ]
-        ),
-      ]);
+      return (
+        <span>
+          {column.label}
+          <span class='caret-wrapper'>
+            <i
+              class='sort-caret ascending'
+              on-click={$event => {
+                this.handleClickSortIcon($event, column, {
+                  prop: column.property,
+                  order: 'ascending',
+                });
+              }}
+            ></i>
+            <i
+              class='sort-caret descending'
+              on-click={$event => {
+                this.handleClickSortIcon($event, column, {
+                  prop: column.property,
+                  order: 'descending',
+                });
+              }}
+            ></i>
+          </span>
+          <el-popover placement='bottom' transition='el-zoom-in-top' trigger='click' content={column.label}>
+            <el-input placeholder='Enter Text Here' prefix-icon='search' />
+            <span class='el-table__column-filter-trigger' slot='reference'><i class='el-icon-arrow-down'></i></span>
+          </el-popover>
+        </span>
+      );
     },
     // ? Methods to get Cards and Categories
     async getCardsData(query) {
@@ -286,6 +292,21 @@ export default {
         sort: this.currentSort.field,
         'sort-order': this.currentSort.order,
       });
+    },
+    async handleClickSortIcon(event, column, change) {
+      event.stopPropagation();
+      let element = event.target;
+      while (element.tagName !== 'TH') {
+        element = element.offsetParent;
+      }
+      if (change.order === 'ascending') {
+        element.classList.remove('descending');
+        element.classList.toggle('ascending');
+      } else {
+        element.classList.toggle('descending');
+        element.classList.remove('ascending');
+      }
+      await this.handleSortChange(change);
     },
     // FIXME: Its lagging a bit
     handleDeleteSelected() {
