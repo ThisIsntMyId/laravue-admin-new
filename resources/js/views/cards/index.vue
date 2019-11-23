@@ -47,6 +47,7 @@
         class="filter-item"
         style="margin-right: 10px; margin-left: 10px;"
       >Show Id</el-checkbox>
+      <el-button class="filter-item" type="primary" @click="dialog.filters = true">Filters</el-button>
     </div>
     <el-row>
       <el-table
@@ -125,11 +126,16 @@
         @pagination="updateCardsList"
       />
     </el-row>
+    <el-dialog title="Tips" :visible.sync="dialog.filters">
+      <!-- FIXME:  handle the pagination in filters also. currently page 2 display normal unfiltered page -->
+      <FiltersComponent @filteredValues="(e) => {getCardsData(e)}" />
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import Pagination from '@/components/Pagination';
+import FiltersComponent from './FiltersComponent';
 import Resource from '@/api/resource';
 import axios from 'axios';
 import { exportWithFieldsToExcel, exportCSVFile } from './exports';
@@ -138,7 +144,7 @@ const CategoryResource = new Resource('categories');
 
 export default {
   name: 'CardIndex',
-  components: { Pagination },
+  components: { Pagination, FiltersComponent },
   data() {
     return {
       cardsData: [],
@@ -187,6 +193,9 @@ export default {
       },
       showId: false,
       popoverVisible: false,
+      dialog: {
+        filters: false,
+      },
     };
   },
   computed: {

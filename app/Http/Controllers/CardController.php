@@ -32,18 +32,49 @@ class CardController extends Controller
         }
     }
 
+    private function getFiltersObject(Request $request)
+    {
+        if ($request->query('filters')) {
+            $filters = $request->query('filters');
+            $chunks = array_chunk(preg_split('/(::|:)/', $filters), 2);
+            $result = array_combine(array_column($chunks, 0), array_column($chunks, 1));
+            if(isset($result['price'])) {
+                $result['price'] = explode(',', $result['price']);
+            }
+            if(isset($result['category'])) {
+                $result['category'] = explode(',', $result['category']);
+            }
+            return collect($result);
+        } else {
+            return null;
+        }
+    }
+
     public function index(Request $request)
     {
+        $cardsQuery = new Card;
+        // filtering
+        $filter = $request->query('filters');
+        if ($filter) {
+            $filterConditions = $this->getFiltersObject($request);
+            $filterConditions->each(function ($item, $key) use (& $cardsQuery) {
+                $methodName = 'filterBy' . ucwords($key);
+                $cardsQuery = $cardsQuery->$methodName($item);
+            });
+        }
+        // sorting
+        $sort_field = $request->query('sort');
+        $sort_mode = $request->query('sort-order');
+        if ($sort_field) {
+            $cardsQuery = $cardsQuery->orderBy($sort_field, strtolower($sort_mode ?? 'asc'));
+        }
+        // limiting
         $limit = $request->query('limit');
         if ($limit && $limit == -1) {
             return card::all();
         }
-        $sort_field = $request->query('sort');
-        $sort_mode = $request->query('sort-order');
-        if ($sort_field) {
-            return Card::orderBy($sort_field, strtolower($sort_mode ?? 'ASC'))->paginate($limit ?? 10);
-        }
-        return Card::paginate($limit ?? 10);
+        // paginiting and returning final results
+        return $cardsQuery->paginate($limit ?? 10);
     }
 
     /**
@@ -55,9 +86,9 @@ class CardController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateData($request);
-        if ($data['errors'])
+        if ($data['errors']) {
             return response()->json($data, 403);
-        else {
+        } else {
             return Card::create($data['data']);
         }
     }
@@ -83,14 +114,15 @@ class CardController extends Controller
     public function update(Request $request, Card $card)
     {
         $data = $this->validateData($request);
-        if ($data['errors'])
+        if ($data['errors']) {
             return response()->json($data, 403);
-        else {
+        } else {
             $status = $card->update($data['data']);
-            if ($status)
+            if ($status) {
                 return $card;
-            else
+            } else {
                 return 'Error';
+            }
         }
     }
 

@@ -27,5 +27,10 @@ new Vue({
   router,
   store,
   i18n,
+  watch: {
+    '$route'(to, from) {
+      document.title = to.meta.title || 'Your Website';
+    },
+  },
   render: h => h(App),
 });

@@ -2,7 +2,13 @@
   <div class="app-container">
     <el-form ref="form" v-loading="loading.cardData" :model="formData" :rules="validationRules">
       <el-form-item label="Name" prop="name">
-        <el-tooltip class="item" effect="dark" content="Name of the card." placement="right" tabindex="-1">
+        <el-tooltip
+          class="item"
+          effect="dark"
+          content="Name of the card."
+          placement="right"
+          tabindex="-1"
+        >
           <i class="el-icon-info" />
         </el-tooltip>
         <el-input v-model="formData.name" />
@@ -188,7 +194,7 @@ export default {
 
 <style scoped>
 .el-tooltip.el-icon-info {
-    position: relative;
-    left: -8px;
+  position: relative;
+  left: -8px;
 }
 </style>
