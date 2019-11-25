@@ -162,19 +162,19 @@ export default {
         price: [
           {
             text: '0-2500 Rs',
-            value: { min: 0, max: 2500 },
+            value: '0,2500',
           },
           {
             text: '2500-5000 Rs',
-            value: { min: 2500, max: 5000 },
+            value: '2500,5000',
           },
           {
             text: '5000-7500 Rs',
-            value: { min: 5000, max: 7500 },
+            value: '5000,7500',
           },
           {
             text: '7500-10000 Rs',
-            value: { min: 7500, max: 10000 },
+            value: '7500,10000',
           },
         ],
         name: '',
@@ -469,16 +469,9 @@ export default {
       // TODO: To unfilter the data locally and globally
     },
     async handleGlobalFilterChange(filter) {
-      alert();
       const colName = Object.keys(filter)[0];
       let filterParam = '';
-      if (colName === 'price') {
-        if (filter.price.length > 0) {
-          filterParam = `${filter.price[0].min},${filter.price[0].max}`;
-        } else {
-          filterParam = [];
-        }
-      } else if (colName === 'category') {
+      if (colName === 'category') {
         filterParam = filter.category.join(',') || [];
       } else {
         filterParam = Object.values(filter)[0];
