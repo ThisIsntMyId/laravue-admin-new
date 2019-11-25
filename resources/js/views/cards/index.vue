@@ -419,6 +419,7 @@ export default {
                 page: this.paginationDetails.currentPage - 1,
               });
             }
+            this.$refs['cardsTable'].clearSelection();
           });
       }
       this.loading.deleteSelected = false;
