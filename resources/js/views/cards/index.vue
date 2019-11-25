@@ -209,7 +209,6 @@ export default {
     filterParamsString: {
       cache: false,
       get() {
-        console.log(this.filterParams);
         if (this.filterParams === {}) {
           return '';
         } else if (typeof this.filterParams === 'string') {
@@ -227,7 +226,6 @@ export default {
   },
   watch: {
     async searchQuerry(newVal, oldVal) {
-      console.log(newVal);
       await this.handleGlobalSearch();
     },
   },
@@ -318,10 +316,6 @@ export default {
         data = await CardResource.list(query);
       }
       this.cardsData = data.data;
-      console.log('data');
-      console.log(data);
-      console.log('this.cardsData');
-      console.log(this.cardsData);
       for (const card of this.cardsData) {
         // TODO: Fix card data should hold category id not category name so that the id can be reused at some other place while where name is required it should be processed
         card['category'] = this.getCategoryName(card.category);
@@ -497,8 +491,6 @@ export default {
         filterParam = Object.values(filter)[0];
       }
       this.filterParams[colName] = filterParam;
-      console.log(this.filterParams);
-      console.log(this.filterParamsString);
       await this.getCardsData({
         filters: this.filterParamsString,
         sort: this.currentSort.field,
