@@ -7,7 +7,7 @@
           effect="dark"
           content="Name of the card."
           placement="right"
-          tabindex="-1"
+          :tabindex="-1"
         >
           <i class="el-icon-info" />
         </el-tooltip>
@@ -19,7 +19,7 @@
           effect="dark"
           content="Some nice and long description about the card."
           placement="right"
-          tabindex="-1"
+          :tabindex="-1"
         >
           <i class="el-icon-info" />
         </el-tooltip>
@@ -31,7 +31,7 @@
           effect="dark"
           content="How much does the card cost."
           placement="right"
-          tabindex="-1"
+          :tabindex="-1"
         >
           <i class="el-icon-info" />
         </el-tooltip>
@@ -43,7 +43,7 @@
           effect="dark"
           content="Which Category does the card belongs to."
           placement="bottom"
-          tabindex="-1"
+          :tabindex="-1"
         >
           <i class="el-icon-info" />
         </el-tooltip>

@@ -83,7 +83,6 @@
           width="100"
           sortable="custom"
           :filters="filters.price"
-          :filter-method="handlePriceFilter"
           column-key="price"
         />
         <!-- ? Remember to use formater attribute to display the category name -->
@@ -92,7 +91,6 @@
           label="Category"
           sortable="custom"
           :filters="categoryFilterValues"
-          :filter-method="handleCategoryFilter"
           column-key="category"
         />
         <el-table-column label="Operations">
@@ -128,7 +126,7 @@
     </el-row>
     <el-dialog title="Tips" :visible.sync="dialog.filters">
       <!-- FIXME:  handle the pagination in filters also. currently page 2 display normal unfiltered page -->
-      <FiltersComponent @filteredValues="(e) => {getCardsData(e)}" />
+      <FiltersComponent @filteredValues="assignFilterValues" />
     </el-dialog>
   </div>
 </template>
@@ -179,7 +177,6 @@ export default {
             value: { min: 7500, max: 10000 },
           },
         ],
-        category: this.categoryFilterValues,
         name: '',
         description: '',
       },
@@ -203,9 +200,27 @@ export default {
       return this.categories.map(cat => {
         return {
           text: cat.name,
-          value: cat.name,
+          value: cat.id,
         };
       });
+    },
+    filterParamsString: {
+      cache: false,
+      get() {
+        console.log(this.filterParams);
+        if (this.filterParams === {}) {
+          return '';
+        } else if (typeof this.filterParams === 'string') {
+          return this.filterParams;
+        } else {
+          return Object.entries(this.filterParams)
+            .filter(filter => filter[1].length > 0)
+            .map(filter => {
+              return filter.join(':');
+            })
+            .join('::');
+        }
+      },
     },
   },
   async created() {
@@ -309,6 +324,7 @@ export default {
       await this.getCardsData({
         page: object.page,
         limit: object.limit,
+        filters: this.filterParamsString,
         sort: this.currentSort.field,
         'sort-order': this.currentSort.order,
       });
@@ -351,6 +367,7 @@ export default {
         page: this.paginationDetails.currentPage,
         limit: this.paginationDetails.limit,
         sort: this.currentSort.field,
+        filters: this.filterParamsString,
         'sort-order': this.currentSort.order,
       });
     },
@@ -418,44 +435,72 @@ export default {
       }
       this.loading.exportLoader = false;
     },
-    // ? Filter Methods
-    handlePriceFilter(value, row, column) {
-      return value.max > row.price && row.price >= value.min;
-    },
-    handleCategoryFilter(value, row, column) {
-      return value === row.category;
-    },
+    // // ? Filter Methods
+    // handlePriceFilter(value, row, column) {
+    //   return value.max > row.price && row.price >= value.min;
+    // },
+    // handleCategoryFilter(value, row, column) {
+    //   return value === row.category;
+    // },
     handleCustomFilterConfirm(colName, column) {
       // TODO: Make press enter to search, whenever clicked outside popover should be disabled
-      this.unfilteredData = this.cardsData;
+      // this.unfilteredData = this.cardsData;
       column.filteredValue = this.filters[column.property];
       this.$refs['cardsTable'].$emit('filter-change', {
         [colName]: this.filters[colName],
       });
-      this.filterParams[colName] = this.filters[colName];
-      // ? Call the server here for filtered data
-      this.cardsData = this.cardsData.filter(card =>
-        card[colName]
-          .toLowerCase()
-          .includes(this.filters[colName].toLowerCase())
-      );
+      // ?// Call the server here for filtered data
+      // this.cardsData = this.cardsData.filter(card =>
+      // card[colName]
+      // .toLowerCase()
+      // .includes(this.filters[colName].toLowerCase())
+      // );
     },
     handleCustomFilterReset(colName, column) {
       this.filters[colName] = '';
       column.filteredValue = [];
-      if (this.unfilteredData.length > 0) {
-        this.cardsData = this.unfilteredData;
-        this.unfilteredData = '';
-      }
+      this.$refs['cardsTable'].$emit('filter-change', {
+        [colName]: this.filters[colName],
+      });
+      // if (this.unfilteredData.length > 0) {
+      //   this.cardsData = this.unfilteredData;
+      //   this.unfilteredData = '';
+      // }
       // TODO: To unfilter the data locally and globally
     },
-    handleGlobalFilterChange(filters) {
-      console.log(filters);
-      console.log(this.$refs['cardsTable']);
-      // for(let field in filters){
-      //   console.log(field);
-      //   this.filterParams[field] = filters[field];
-      // }
+    async handleGlobalFilterChange(filter) {
+      alert();
+      const colName = Object.keys(filter)[0];
+      let filterParam = '';
+      if (colName === 'price') {
+        if (filter.price.length > 0) {
+          filterParam = `${filter.price[0].min},${filter.price[0].max}`;
+        } else {
+          filterParam = [];
+        }
+      } else if (colName === 'category') {
+        filterParam = filter.category.join(',') || [];
+      } else {
+        filterParam = Object.values(filter)[0];
+      }
+      this.filterParams[colName] = filterParam;
+      console.log(this.filterParams);
+      console.log(this.filterParamsString);
+      await this.getCardsData({
+        filters: this.filterParamsString,
+        sort: this.currentSort.field,
+        'sort-order': this.currentSort.order,
+      });
+    },
+    async assignFilterValues(filterParams) {
+      this.filterParams = filterParams.filters;
+      this.currentSort.field = filterParams.sortField || this.currentSort.field;
+      this.currentSort.order = filterParams.sortOrder || this.currentSort.order;
+      await this.getCardsData({
+        filters: this.filterParams,
+        sort: this.currentSort.field,
+        'sort-order': this.currentSort.order,
+      });
     },
   },
 };

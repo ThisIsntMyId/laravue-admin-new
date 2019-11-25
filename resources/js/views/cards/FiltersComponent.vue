@@ -2,16 +2,16 @@
   <div>
     <h1>Filters Component</h1>
     <el-form ref="filterForm" :model="formData">
-      <el-form-item label="Name">
+      <el-form-item label="Name" prop="name">
         <el-input v-model="formData.name" />
       </el-form-item>
-      <el-form-item label="Description">
+      <el-form-item label="Description" prop="description">
         <el-input v-model="formData.description" />
       </el-form-item>
-      <el-form-item label="Price">
+      <el-form-item label="Price" prop="price">
         <el-slider v-model="formData.price" range :min="0" :max="10000" />
       </el-form-item>
-      <el-form-item label="Category">
+      <el-form-item label="Category" prop="category">
         <el-select
           v-model="formData.category"
           multiple
@@ -26,7 +26,7 @@
           />
         </el-select>
       </el-form-item>
-      <el-form-item label="Sort">
+      <el-form-item label="Sort Field" prop="sortField">
         <el-select v-model="formData.sortField" placeholder="Select field to sort">
           <el-option
             v-for="(item, index) of ['name', 'description', 'price', 'category']"
@@ -35,6 +35,8 @@
             :value="item"
           />
         </el-select>
+      </el-form-item>
+      <el-form-item label="Sort Order" sort="sortOrder">
         <el-select v-model="formData.sortOrder" width="80px" placeholder="Sort order">
           <el-option
             v-for="item in sortOptions"
@@ -97,22 +99,30 @@ export default {
       filters.price = this.formData.price.join(',');
       delete filters.sortField;
       delete filters.sortOrder;
-      console.log(filters);
-      const filtersQs = Object.entries(filters).map(filter => {
-        return filter.join(':');
-      }).join('::');
-      console.log(filtersQs);
+      const filtersQs = Object.entries(filters)
+        .filter(filter => filter[1].length > 0)
+        .map(filter => {
+          return filter.join(':');
+        })
+        .join('::');
 
-      this.$emit('filteredValues', {
+      const qsObj = {
         page: 1,
         filters: filtersQs,
-        sort: this.formData.sortField,
-        'sort-order': this.formData.sortOrder,
-      });
+      };
+      if (this.formData.sortField) {
+        qsObj['sort'] = this.formData.sortField;
+      }
+      if (this.formData.sortOrder) {
+        qsObj['sort-order'] = this.formData.sortOrder;
+      }
+      this.$emit('filteredValues', qsObj);
       return;
     },
     resetForm() {
       this.$refs['filterForm'].resetFields();
+      this.formData.price = [0, 10000];
+      this.$emit('filteredValues', {});
     },
   },
 };
