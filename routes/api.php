@@ -26,6 +26,7 @@ Route::group(['middleware' => 'api'], function () {
         Route::post('auth/logout', 'AuthController@logout');
     });
 
+    Route::get('cards/search', 'CardController@search');
     Route::apiResource('cards', 'CardController');
     Route::delete('deletemanycards', 'CardController@deletemany');
     Route::apiResource('categories', 'CategoryController');

@@ -2,10 +2,13 @@
   <div class="app-container">
     <div class="filter-container">
       <el-input
+        v-model="searchQuerry"
         class="filter-item"
         style="width:200px; margin-right: 10px;"
         placeholder="Search"
         prefix-icon="el-icon-search"
+        clearable
+        @keydown.enter.native="handleGlobalSearch"
       />
       <el-button class="filter-item" type="primary">import</el-button>
       <el-dropdown
@@ -125,7 +128,6 @@
       />
     </el-row>
     <el-dialog title="Tips" :visible.sync="dialog.filters">
-      <!-- FIXME:  handle the pagination in filters also. currently page 2 display normal unfiltered page -->
       <FiltersComponent @filteredValues="assignFilterValues" />
     </el-dialog>
   </div>
@@ -182,7 +184,6 @@ export default {
       },
       filterParams: {},
       unfilteredData: [], // ? Temporary to store previous data to revert to unfiltered values locally
-      search: '123',
       loading: {
         cardsData: false,
         exportLoader: false,
@@ -193,6 +194,7 @@ export default {
       dialog: {
         filters: false,
       },
+      searchQuerry: '',
     };
   },
   computed: {
@@ -221,6 +223,12 @@ export default {
             .join('::');
         }
       },
+    },
+  },
+  watch: {
+    async searchQuerry(newVal, oldVal) {
+      console.log(newVal);
+      await this.handleGlobalSearch();
     },
   },
   async created() {
@@ -300,8 +308,20 @@ export default {
     // ? Methods to get Cards and Categories
     async getCardsData(query) {
       this.loading.cardsData = true;
-      const data = await CardResource.list(query);
+      let data = '';
+      if (this.searchQuerry) {
+        data = await axios.get(
+          `http://127.0.0.1:8000/api/cards/search?q=${this.searchQuerry}&limit=${query.limit}&page=${query.page}`
+        );
+        data = data.data;
+      } else {
+        data = await CardResource.list(query);
+      }
       this.cardsData = data.data;
+      console.log('data');
+      console.log(data);
+      console.log('this.cardsData');
+      console.log(this.cardsData);
       for (const card of this.cardsData) {
         // TODO: Fix card data should hold category id not category name so that the id can be reused at some other place while where name is required it should be processed
         card['category'] = this.getCategoryName(card.category);
@@ -494,6 +514,10 @@ export default {
         sort: this.currentSort.field,
         'sort-order': this.currentSort.order,
       });
+    },
+    // ? Search Functions
+    async handleGlobalSearch() {
+      await this.getCardsData({ limit: 10, page: 1 });
     },
   },
 };

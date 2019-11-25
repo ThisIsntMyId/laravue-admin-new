@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Laravue\Models\Card;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class CardController extends Controller
@@ -38,10 +39,10 @@ class CardController extends Controller
             $filters = $request->query('filters');
             $chunks = array_chunk(preg_split('/(::|:)/', $filters), 2);
             $result = array_combine(array_column($chunks, 0), array_column($chunks, 1));
-            if(isset($result['price'])) {
+            if (isset($result['price'])) {
                 $result['price'] = explode(',', $result['price']);
             }
-            if(isset($result['category'])) {
+            if (isset($result['category'])) {
                 $result['category'] = explode(',', $result['category']);
             }
             return collect($result);
@@ -153,7 +154,30 @@ class CardController extends Controller
     {
         $ids = $request->input('ids');
         Card::destroy($ids);
-        dd($ids);
         return response()->json(null, 204);
+    }
+
+    public function search(Request $request)
+    {
+        $searchQuery = $request->query('q');
+        // ? Via FULL TEXT index of mysql. Via using trait and centralizing the search logic at one place. Doesn't gives results for 'Mr'
+        // return Card::search($searchQuery)->paginate(10);
+        
+        // ? Via FULL TEXT index of mysql. Doesn't gives results for 'Mr'
+        // return Card::whereRaw(
+            //     "MATCH(name,description) AGAINST(? IN BOOLEAN MODE)",
+            //     array($searchQuery)
+            // )->paginate(1);
+            
+        // ? Via normally. Gives results for 'Mr'
+        $limit = $request->query('limit');
+        if ($limit && $limit == -1) {
+            return card::where('name', 'like', '%'.$searchQuery.'%')
+                         ->orWhere('description', 'like', '%'.$searchQuery.'%')
+                         ->get();
+        }
+        return Card::where('name', 'like', '%'.$searchQuery.'%')
+                    ->orWhere('description', 'like', '%'.$searchQuery.'%')
+                    ->paginate($limit ?? 10);
     }
 }

@@ -2,11 +2,22 @@
 
 namespace App\Laravue\Models;
 
+use App\Laravue\Models\FullTextSearch;
 use Illuminate\Database\Eloquent\Model;
 
 class Card extends Model
 {
+    use FullTextSearch;
+    
     protected $guarded = [];
+
+    /**
+     * The columns of the full text index
+     */
+    protected $searchable = [
+        'name',
+        'description',
+    ];
 
     /**
      * Scope a query to only include cards whose name contain given name.
