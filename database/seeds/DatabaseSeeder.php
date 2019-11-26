@@ -54,6 +54,10 @@ class DatabaseSeeder extends Seeder
             UsersTableSeeder::class,
             CategoriessTableSeeder::class,
             CardsTableSeeder::class,
+            FoodsTableSeeder::class,
+            LocationsTableSeeder::class,
+            NaturesTableSeeder::class,
+            MonstersTableSeeder::class,
         ]);
     }
 }
