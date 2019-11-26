@@ -30,7 +30,12 @@ Route::group(['middleware' => 'api'], function () {
     Route::apiResource('cards', 'CardController');
     Route::delete('deletemanycards', 'CardController@deletemany');
     Route::apiResource('categories', 'CategoryController');
-
+    
+    Route::apiResource('monsters', 'MonsterController');
+    Route::get('foods', 'FoodController@index');
+    Route::get('natures', 'NatureController@index');
+    Route::get('locations', 'LocationController@index');
+    
     Route::apiResource('users', 'UserController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);
     Route::get('users/{user}/permissions', 'UserController@permissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
     Route::put('users/{user}/permissions', 'UserController@updatePermissions')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_PERMISSION_MANAGE);
