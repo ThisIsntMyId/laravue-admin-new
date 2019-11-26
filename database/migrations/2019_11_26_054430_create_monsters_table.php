@@ -23,7 +23,7 @@ class CreateMonstersTable extends Migration
             $table->string('nature');               //multiselect dragselect           => comes from nature table
                                                     // => the first and the last values represets most and least accurate natures exhibit by monster
             $table->integer('health');
-            $table->string('energy');
+            $table->integer('energy');
             $table->string('found_in');             //multiselect dragselect multilang => comes from location table
             // => the first and the last values repesents the most and the least likly hood of finding the monster in the given area
             $table->timestamps();
