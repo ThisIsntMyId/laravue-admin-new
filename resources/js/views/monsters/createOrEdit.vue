@@ -117,7 +117,24 @@
                   <strong>Favourite Food</strong>
                 </div>
                 <div>
-                  <el-tag>food</el-tag>
+                  <el-select
+                    v-model="formData.fav_food"
+                    style="width:100%;"
+                    multiple
+                    filterable
+                    remote
+                    reserve-keyword
+                    placeholder="Please enter a keyword"
+                    :remote-method="remoteMethod"
+                    :loading="loading"
+                  >
+                    <el-option
+                      v-for="item in foodsArr"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
                 </div>
               </el-row>
               <el-row class="info">
@@ -125,7 +142,19 @@
                   <strong>Nature</strong>
                 </div>
                 <div>
-                  <el-tag>nature</el-tag>
+                  <el-drag-select
+                    v-model="formData.nature"
+                    style="width:100%;"
+                    multiple
+                    placeholder="Select Nature"
+                  >
+                    <el-option
+                      v-for="item in naturesArr"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-drag-select>
                 </div>
               </el-row>
               <el-row class="info">
@@ -163,9 +192,12 @@
 
 <script>
 import PanThumb from '@/components/PanThumb';
+import ElDragSelect from '@/components/DragSelect';
+import axios from 'axios';
+
 export default {
   name: 'AddOrUpdateMonster',
-  components: { PanThumb },
+  components: { PanThumb, ElDragSelect },
   data() {
     return {
       language: {
@@ -179,8 +211,20 @@ export default {
         japanese_description: '',
         health: '',
         energy: '',
+        fav_food: '',
+        nature: [],
+        found_in: '',
       },
+      foodsArr: [],
+      naturesArr: [],
+      locationsArr: [],
     };
+  },
+  async created() {
+    this.naturesArr = (await axios.get(
+      'http://127.0.0.1:8000/api/natures?limit=-1'
+    )).data;
+    console.log(this.naturesArr);
   },
   methods: {
     submitForm() {
@@ -195,6 +239,15 @@ export default {
     },
     resetForm() {
       this.$refs['form'].resetFields();
+    },
+    async remoteMethod(query) {
+      if (query !== '') {
+        this.foodsArr = (await axios.post(
+          `http://127.0.0.1:8000/api/foods/search?q=${query}`
+        )).data;
+      } else {
+        this.foodsArr = [];
+      }
     },
   },
 };

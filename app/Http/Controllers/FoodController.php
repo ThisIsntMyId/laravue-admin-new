@@ -14,9 +14,7 @@ class FoodController extends Controller
      */
     public function index(Request $request)
     {
-
-        if($request->query('ids'))
-        {
+        if ($request->query('ids')) {
             return Food::whereIn('id', json_decode('['. $request->query('ids') .']'))->get();
         }
 
@@ -72,5 +70,10 @@ class FoodController extends Controller
     public function destroy(Food $food)
     {
         //
+    }
+
+    public function search(Request $request)
+    {
+        return Food::where('name', 'like', '%' . $request->query('q') . '%')->get();
     }
 }

@@ -33,6 +33,7 @@ Route::group(['middleware' => 'api'], function () {
     
     Route::apiResource('monsters', 'MonsterController');
     Route::get('foods', 'FoodController@index');
+    Route::post('foods/search', 'FoodController@search');
     Route::get('natures', 'NatureController@index');
     Route::get('locations', 'LocationController@index');
     
