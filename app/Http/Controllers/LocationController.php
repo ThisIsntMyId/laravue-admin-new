@@ -71,4 +71,9 @@ class LocationController extends Controller
     {
         //
     }
+
+    public function search(Request $request)
+    {
+        return Location::where('name', 'like', '%' . $request->query('q') . '%')->get();
+    }
 }

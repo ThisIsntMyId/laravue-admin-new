@@ -35,6 +35,7 @@ Route::group(['middleware' => 'api'], function () {
     Route::get('foods', 'FoodController@index');
     Route::post('foods/search', 'FoodController@search');
     Route::get('natures', 'NatureController@index');
+    Route::post('locations/search', 'LocationController@search');
     Route::get('locations', 'LocationController@index');
     
     Route::apiResource('users', 'UserController')->middleware('permission:' . \App\Laravue\Acl::PERMISSION_USER_MANAGE);

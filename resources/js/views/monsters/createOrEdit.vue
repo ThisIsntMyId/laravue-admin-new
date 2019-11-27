@@ -166,7 +166,24 @@
                   </el-radio-group>
                 </div>
                 <div>
-                  <el-tag>language</el-tag>
+                  <el-drag-select
+                    v-model="formData.found_in"
+                    style="width:100%;"
+                    multiple
+                    filterable
+                    remote
+                    reserve-keyword
+                    placeholder="Please enter a keyword"
+                    :remote-method="remoteMethodLocation"
+                    :loading="loading"
+                  >
+                    <el-option
+                      v-for="item in locationsArr"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-drag-select>
                 </div>
               </el-row>
             </el-col>
@@ -247,6 +264,15 @@ export default {
         )).data;
       } else {
         this.foodsArr = [];
+      }
+    },
+    async remoteMethodLocation(query) {
+      if (query !== '') {
+        this.locationsArr = (await axios.post(
+          `http://127.0.0.1:8000/api/locations/search?q=${query}`
+        )).data;
+      } else {
+        this.locationsArr = [];
       }
     },
   },
