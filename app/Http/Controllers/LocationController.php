@@ -14,12 +14,16 @@ class LocationController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->query('ids')) {
+            return Location::whereIn('id', json_decode('['. $request->query('ids') .']'))->get();
+        }
+
         // limiting
         $limit = $request->query('limit');
         if ($limit && $limit == -1) {
             return Location::all();
         }
-        // paginiting and returning final results
+        // paginating and returning final results
         return Location::paginate($limit ?? 10);
     }
 

@@ -14,12 +14,16 @@ class NatureController extends Controller
      */
     public function index(Request $request)
     {
+        if ($request->query('ids')) {
+            return Nature::whereIn('id', json_decode('['. $request->query('ids') .']'))->get();
+        }
+        
         // limiting
         $limit = $request->query('limit');
         if ($limit && $limit == -1) {
             return Nature::all();
         }
-        // paginiting and returning final results
+        // paginating and returning final results
         return Nature::paginate($limit ?? 10);
     }
 

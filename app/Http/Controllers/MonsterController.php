@@ -20,7 +20,7 @@ class MonsterController extends Controller
         if ($limit && $limit == -1) {
             return Monster::all();
         }
-        // paginiting and returning final results
+        // paginating and returning final results
         return Monster::paginate($limit ?? 10);
     }
 

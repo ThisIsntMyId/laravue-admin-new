@@ -14,12 +14,18 @@ class FoodController extends Controller
      */
     public function index(Request $request)
     {
+
+        if($request->query('ids'))
+        {
+            return Food::whereIn('id', json_decode('['. $request->query('ids') .']'))->get();
+        }
+
         // limiting
         $limit = $request->query('limit');
         if ($limit && $limit == -1) {
             return Food::all();
         }
-        // paginiting and returning final results
+        // paginating and returning final results
         return Food::paginate($limit ?? 10);
     }
 
