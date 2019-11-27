@@ -152,6 +152,40 @@ export const constantRoutes = [
       },
     ],
   },
+  {
+    path: '/monsters',
+    redirect: '/monsters/index',
+    component: Layout,
+    meta: { title: 'Monster', icon: 'monster' },
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/monsters/index'),
+        name: 'Monster List',
+        meta: { title: 'Monsters List', icon: 'monster', noCache: true },
+      },
+      {
+        path: '/monsters/create',
+        component: () => import('@/views/monsters/createOrEdit'),
+        name: 'Add Monster',
+        meta: { title: 'Add Monster', icon: 'add-monster', noCache: true },
+      },
+      {
+        path: '/monsters/view/:id',
+        component: () => import('@/views/monsters/view.vue'),
+        name: 'View Monster',
+        hidden: true,
+        meta: { title: 'View Monster', noCache: true },
+      },
+      {
+        path: '/monsters/edit/:id',
+        component: () => import('@/views/monsters/createOrEdit.vue'),
+        name: 'Edit Monster',
+        hidden: true,
+        meta: { title: 'Edit Monster', noCache: true },
+      },
+    ],
+  },
   elementUiRoutes,
 ];
 
