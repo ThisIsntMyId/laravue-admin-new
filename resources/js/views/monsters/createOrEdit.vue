@@ -126,7 +126,7 @@
                     reserve-keyword
                     placeholder="Please enter a keyword"
                     :remote-method="remoteMethod"
-                    :loading="loading"
+                    :loading="loading.foodSelect"
                   >
                     <el-option
                       v-for="item in foodsArr"
@@ -175,12 +175,12 @@
                     reserve-keyword
                     placeholder="Please enter a keyword"
                     :remote-method="remoteMethodLocation"
-                    :loading="loading"
+                    :loading="loading.locationSelect"
                   >
                     <el-option
                       v-for="item in locationsArr"
                       :key="item.id"
-                      :label="item.name"
+                      :label="language.location == 'en' ? item.name : item.japanese_name"
                       :value="item.id"
                     />
                   </el-drag-select>
@@ -228,13 +228,17 @@ export default {
         japanese_description: '',
         health: '',
         energy: '',
-        fav_food: '',
+        fav_food: [],
         nature: [],
-        found_in: '',
+        found_in: [],
       },
       foodsArr: [],
       naturesArr: [],
       locationsArr: [],
+      loading: {
+        locationSelect: false,
+        foodSelect: false,
+      },
     };
   },
   async created() {
