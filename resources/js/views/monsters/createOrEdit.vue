@@ -206,8 +206,8 @@
               <el-col :span="3" class="action-button-container">
                 <el-button @click="resetForm">Reset</el-button>
               </el-col>
-              <el-col :span="3" class="action-button-container">
-                <el-button type="danger">Delete</el-button>
+              <el-col v-if="$route.params.id" :span="3" class="action-button-container">
+                <el-button v-loading="loading.delete" type="danger" @click="deleteMonster">Delete</el-button>
               </el-col>
             </el-row>
           </el-card>
@@ -281,6 +281,7 @@ export default {
         foodSelect: false,
         formSubmit: false,
         monsterData: false,
+        delete: false,
       },
       validationRules: {
         name: [
@@ -423,6 +424,20 @@ export default {
       } else {
         this.locationsArr = [];
       }
+    },
+    deleteMonster() {
+      this.loading.delete = true;
+      axios
+        .delete(`http://127.0.0.1:8000/api/monsters/${this.$route.params.id}`)
+        .then(() => {
+          this.$message.success('Monster deleted successfully');
+          this.loading.delete = false;
+          this.$router.go(-1);
+        })
+        .catch(() => {
+          this.$message.error('There was an error while deleting');
+          this.loading.delete = false;
+        });
     },
   },
 };
