@@ -412,6 +412,15 @@ export default {
         this.foodsArr = (await axios.post(
           `http://127.0.0.1:8000/api/foods/search?q=${query}`
         )).data;
+        const currentSelectedValued = (await axios.get(
+          `http://127.0.0.1:8000/api/foods?ids=${this.formData.fav_food}`
+        )).data;
+        // When we search for new words, then the old array is gone which contains the labels for previously selected food values.
+        // now if those values are lost then their ids are being used as label. so to fix that the foodsArr is filled with
+        // first: the searched query as well as the values of the currently selected values
+        this.foodsArr = [
+          ...new Set([...this.foodsArr, ...currentSelectedValued]),
+        ];
       } else {
         this.foodsArr = [];
       }
