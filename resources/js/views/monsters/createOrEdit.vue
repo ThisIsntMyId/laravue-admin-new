@@ -5,7 +5,7 @@
         <h1>Add New Monster</h1>
       </el-col>
     </el-row>
-    <el-form refs="form" :model="formData">
+    <el-form ref="form" :model="formData" :rules="validationRules">
       <el-row>
         <el-col :span="8">
           <el-row>
@@ -24,28 +24,28 @@
               </div>
               <el-row>
                 <el-col :span="18">
-                  <div v-if="language.details == 'en'">
-                    <el-form-item class="details-field">
+                  <div v-show="language.details == 'en'">
+                    <el-form-item class="details-field" prop="name">
                       <el-row>
                         <strong>Name</strong>
                       </el-row>
                       <el-input v-model="formData.name" />
                     </el-form-item>
-                    <el-form-item class="details-field">
+                    <el-form-item class="details-field" prop="description">
                       <el-row>
                         <strong>Description</strong>
                       </el-row>
                       <el-input v-model="formData.description" type="textarea" />
                     </el-form-item>
                   </div>
-                  <div v-if="language.details == 'ja'">
-                    <el-form-item class="details-field">
+                  <div v-show="language.details == 'ja'">
+                    <el-form-item class="details-field" prop="japanese_name">
                       <el-row>
                         <strong>Japanese Name</strong>
                       </el-row>
                       <el-input v-model="formData.japanese_name" />
                     </el-form-item>
-                    <el-form-item class="details-field">
+                    <el-form-item class="details-field" prop="japanese_description">
                       <el-row>
                         <strong>Japanese Description</strong>
                       </el-row>
@@ -78,7 +78,7 @@
               </div>
               <el-row>
                 <el-col :span="12">
-                  <el-form-item class="stats-container">
+                  <el-form-item class="stats-container" prop="health">
                     <el-row class="center">
                       <strong>Health</strong>
                     </el-row>
@@ -88,7 +88,7 @@
                   </el-form-item>
                 </el-col>
                 <el-col :span="12" class="stats-container">
-                  <el-form-item class="stats-container">
+                  <el-form-item class="stats-container" prop="energy">
                     <el-row class="center">
                       <strong>Energy</strong>
                     </el-row>
@@ -112,89 +112,95 @@
               </div>
             </div>
             <el-col>
-              <el-row class="info">
-                <div class="title">
-                  <strong>Favourite Food</strong>
-                </div>
-                <div>
-                  <el-select
-                    v-model="formData.fav_food"
-                    style="width:100%;"
-                    multiple
-                    filterable
-                    remote
-                    reserve-keyword
-                    placeholder="Please enter a keyword"
-                    :remote-method="remoteMethod"
-                    :loading="loading.foodSelect"
-                  >
-                    <el-option
-                      v-for="item in foodsArr"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-select>
-                </div>
-              </el-row>
-              <el-row class="info">
-                <div class="title">
-                  <strong>Nature</strong>
-                </div>
-                <div>
-                  <el-drag-select
-                    v-model="formData.nature"
-                    style="width:100%;"
-                    multiple
-                    placeholder="Select Nature"
-                  >
-                    <el-option
-                      v-for="item in naturesArr"
-                      :key="item.id"
-                      :label="item.name"
-                      :value="item.id"
-                    />
-                  </el-drag-select>
-                </div>
-              </el-row>
-              <el-row class="info">
-                <div class="title">
-                  <strong>Found In</strong>
-                  <el-radio-group v-model="language.location" style="float: right;" size="mini">
-                    <el-radio-button label="en">English</el-radio-button>
-                    <el-radio-button label="ja">Japanese</el-radio-button>
-                  </el-radio-group>
-                </div>
-                <div>
-                  <el-drag-select
-                    v-model="formData.found_in"
-                    style="width:100%;"
-                    multiple
-                    filterable
-                    remote
-                    reserve-keyword
-                    placeholder="Please enter a keyword"
-                    :remote-method="remoteMethodLocation"
-                    :loading="loading.locationSelect"
-                  >
-                    <el-option
-                      v-for="item in locationsArr"
-                      :key="item.id"
-                      :label="language.location == 'en' ? item.name : item.japanese_name"
-                      :value="item.id"
-                    />
-                  </el-drag-select>
-                </div>
-              </el-row>
+              <el-form-item prop="fav_food">
+                <el-row class="info">
+                  <div class="title">
+                    <strong>Favourite Food</strong>
+                  </div>
+                  <div>
+                    <el-select
+                      v-model="formData.fav_food"
+                      style="width:100%;"
+                      multiple
+                      filterable
+                      remote
+                      reserve-keyword
+                      placeholder="Please enter a keyword"
+                      :remote-method="remoteMethod"
+                      :loading="loading.foodSelect"
+                    >
+                      <el-option
+                        v-for="item in foodsArr"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-select>
+                  </div>
+                </el-row>
+              </el-form-item>
+              <el-form-item prop="nature">
+                <el-row class="info">
+                  <div class="title">
+                    <strong>Nature</strong>
+                  </div>
+                  <div>
+                    <el-drag-select
+                      v-model="formData.nature"
+                      style="width:100%;"
+                      multiple
+                      placeholder="Select Nature"
+                    >
+                      <el-option
+                        v-for="item in naturesArr"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-drag-select>
+                  </div>
+                </el-row>
+              </el-form-item>
+              <el-form-item prop="found_in">
+                <el-row class="info">
+                  <div class="title">
+                    <strong>Found In</strong>
+                    <el-radio-group v-model="language.location" style="float: right;" size="mini">
+                      <el-radio-button label="en">English</el-radio-button>
+                      <el-radio-button label="ja">Japanese</el-radio-button>
+                    </el-radio-group>
+                  </div>
+                  <div>
+                    <el-drag-select
+                      v-model="formData.found_in"
+                      style="width:100%;"
+                      multiple
+                      filterable
+                      remote
+                      reserve-keyword
+                      placeholder="Please enter a keyword"
+                      :remote-method="remoteMethodLocation"
+                      :loading="loading.locationSelect"
+                    >
+                      <el-option
+                        v-for="item in locationsArr"
+                        :key="item.id"
+                        :label="language.location == 'en' ? item.name : item.japanese_name"
+                        :value="item.id"
+                      />
+                    </el-drag-select>
+                  </div>
+                </el-row>
+              </el-form-item>
             </el-col>
           </el-card>
           <el-card class="actions">
             <el-row>
               <el-col :span="3" class="action-button-container">
-                <el-button type="primary">Save</el-button>
+                <el-button v-loading="loading.formSubmit" type="primary" @click="submitForm">Save</el-button>
               </el-col>
               <el-col :span="3" class="action-button-container">
-                <el-button>Reset</el-button>
+                <el-button @click="resetForm">Reset</el-button>
               </el-col>
               <el-col :span="3" class="action-button-container">
                 <el-button type="danger">Delete</el-button>
@@ -216,6 +222,37 @@ export default {
   name: 'AddOrUpdateMonster',
   components: { PanThumb, ElDragSelect },
   data() {
+    var healthValidator = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('Please Enter Health'));
+      }
+      setTimeout(() => {
+        if (!Number.isInteger(value)) {
+          callback(new Error('Health must be in numbers only'));
+        } else {
+          if (value < 0 || value > 1000) {
+            callback(new Error('Health must me between 0,1000'));
+          } else {
+            callback();
+          }
+        }
+      }, 1000);
+    };
+    var energyValidator = (rule, value, callback) => {
+      if (!value) {
+        return callback(new Error('Please Enter Energy'));
+      }
+      if (!Number.isInteger(value)) {
+        callback(new Error('Energy must be in numbers only'));
+      } else {
+        if (value < 0 || value > 1000) {
+          callback(new Error('Energy must me between 0,1000'));
+        } else {
+          callback();
+        }
+      }
+    };
+
     return {
       language: {
         details: 'en',
@@ -238,6 +275,25 @@ export default {
       loading: {
         locationSelect: false,
         foodSelect: false,
+        formSubmit: false,
+      },
+      validationRules: {
+        name: [
+          {
+            required: true,
+            message: 'Please enter name of monster',
+            trigger: 'blur',
+          },
+        ],
+        japanese_name: [
+          {
+            required: true,
+            message: 'Please enter japanese name of monster',
+            trigger: 'blur',
+          },
+        ],
+        health: [{ validator: healthValidator, trigger: 'blur' }],
+        energy: [{ validator: energyValidator, trigger: 'blur' }],
       },
     };
   },
@@ -249,17 +305,44 @@ export default {
   },
   methods: {
     submitForm() {
+      this.loading.formSubmit = true;
       this.$refs['form'].validate(valid => {
         if (valid) {
-          alert('submit!');
+          const dataToBeSent = this.prepareFormData(this.formData);
+          console.log(dataToBeSent);
+          axios
+            .post('http://127.0.0.1:8000/api/monsters', dataToBeSent)
+            .then(() => {
+              this.$message.success('Monster added successfully.');
+              this.resetForm();
+              this.loading.formSubmit = false;
+            })
+            .catch(() => {
+              this.$message.error(
+                'There were some erors while adding monster. Plz try again later.'
+              );
+              this.loading.formSubmit = false;
+            });
         } else {
-          console.log('error submit!!');
-          return false;
+          if (this.formData.name && this.formData.japanese_name === '') {
+            this.language.details = 'ja';
+          }
+          this.$message.error(
+            'There are some erors in your form. Please Fix them.'
+          );
+          this.loading.formSubmit = false;
         }
       });
     },
     resetForm() {
       this.$refs['form'].resetFields();
+    },
+    prepareFormData(data) {
+      const newData = Object.assign({}, data);
+      newData.fav_food = newData.fav_food.join(',');
+      newData.nature = newData.nature.join(',');
+      newData.found_in = newData.found_in.join(',');
+      return newData;
     },
     async remoteMethod(query) {
       if (query !== '') {
