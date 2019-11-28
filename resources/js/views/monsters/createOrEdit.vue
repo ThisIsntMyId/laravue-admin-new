@@ -2,10 +2,10 @@
   <div class="app-container">
     <el-row>
       <el-col :span="24">
-        <h1>Add New Monster</h1>
+        <h1>{{ $route.params.id ? 'Edit Monster Page' : 'Add Monster Page' }}</h1>
       </el-col>
     </el-row>
-    <el-form ref="form" :model="formData" :rules="validationRules">
+    <el-form ref="form" v-loading="loading.monsterData" :model="formData" :rules="validationRules">
       <el-row>
         <el-col :span="8">
           <el-row>
@@ -197,7 +197,11 @@
           <el-card class="actions">
             <el-row>
               <el-col :span="3" class="action-button-container">
-                <el-button v-loading="loading.formSubmit" type="primary" @click="submitForm">Save</el-button>
+                <el-button
+                  v-loading="loading.formSubmit"
+                  type="primary"
+                  @click="$route.params.id ? updateMonster() : createMonster()"
+                >{{ $route.params.id ? 'Save' : 'Create' }}</el-button>
               </el-col>
               <el-col :span="3" class="action-button-container">
                 <el-button @click="resetForm">Reset</el-button>
@@ -276,6 +280,7 @@ export default {
         locationSelect: false,
         foodSelect: false,
         formSubmit: false,
+        monsterData: false,
       },
       validationRules: {
         name: [
@@ -301,10 +306,12 @@ export default {
     this.naturesArr = (await axios.get(
       'http://127.0.0.1:8000/api/natures?limit=-1'
     )).data;
-    console.log(this.naturesArr);
+    if (this.$route.params.id) {
+      await this.initializeMonsterData(this.$route.params.id);
+    }
   },
   methods: {
-    submitForm() {
+    createMonster() {
       this.loading.formSubmit = true;
       this.$refs['form'].validate(valid => {
         if (valid) {
@@ -314,7 +321,7 @@ export default {
             .post('http://127.0.0.1:8000/api/monsters', dataToBeSent)
             .then(() => {
               this.$message.success('Monster added successfully.');
-              this.resetForm();
+              this.initializeMonsterData(this.$route.params.id);
               this.loading.formSubmit = false;
             })
             .catch(() => {
@@ -334,8 +341,44 @@ export default {
         }
       });
     },
+    updateMonster() {
+      this.loading.formSubmit = true;
+      this.$refs['form'].validate(valid => {
+        if (valid) {
+          const dataToBeSent = this.prepareFormData(this.formData);
+          axios
+            .patch(
+              `http://127.0.0.1:8000/api/monsters/${this.$route.params.id}`,
+              dataToBeSent
+            )
+            .then(() => {
+              this.$message.success('Monster updated successfully.');
+              this.resetForm();
+              this.loading.formSubmit = false;
+            })
+            .catch(() => {
+              this.$message.error(
+                'There were some erors while updating monster. Plz try again later.'
+              );
+              this.loading.formSubmit = false;
+            });
+        } else {
+          if (this.formData.name && this.formData.japanese_name === '') {
+            this.language.details = 'ja';
+          }
+          this.$message.error(
+            'There are some erors in your form. Please Fix them.'
+          );
+          this.loading.formSubmit = false;
+        }
+      });
+    },
     resetForm() {
-      this.$refs['form'].resetFields();
+      if (this.$route.params.id) {
+        this.initializeMonsterData(this.$route.params.id);
+      } else {
+        this.$refs['form'].resetFields();
+      }
     },
     prepareFormData(data) {
       const newData = Object.assign({}, data);
@@ -343,6 +386,25 @@ export default {
       newData.nature = newData.nature.join(',');
       newData.found_in = newData.found_in.join(',');
       return newData;
+    },
+    async initializeMonsterData(id) {
+      this.loading.monsterData = true;
+      const monsterData = (await axios.get(
+        `http://127.0.0.1:8000/api/monsters/${id}`
+      )).data;
+      const foods = (await axios.get(
+        `http://127.0.0.1:8000/api/foods?ids=${monsterData.fav_food}`
+      )).data;
+      const locations = (await axios.get(
+        `http://127.0.0.1:8000/api/locations?ids=${monsterData.found_in}`
+      )).data;
+      monsterData.fav_food = JSON.parse(`[${monsterData.fav_food}]`);
+      monsterData.nature = JSON.parse(`[${monsterData.nature}]`);
+      monsterData.found_in = JSON.parse(`[${monsterData.found_in}]`);
+      this.foodsArr = foods;
+      this.locationsArr = locations;
+      this.formData = monsterData;
+      this.loading.monsterData = false;
     },
     async remoteMethod(query) {
       if (query !== '') {
