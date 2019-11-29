@@ -94,10 +94,11 @@ export default {
        *
        */
       const orderArr = JSON.parse(`[${order}]`);
-      const sortedArr = [];
+      let sortedArr = [];
       orderArr.forEach(id => {
         sortedArr.push(array.find(el => el.id === id));
       });
+      sortedArr = sortedArr.filter(obj => obj);
       return sortedArr;
     },
     async getMonstersArrayData() {
@@ -115,6 +116,8 @@ export default {
         localfoodsArr,
         this.monsterData.fav_food.replace(/\[|\]/g, '')
       );
+      console.log('foodsArr');
+      console.log(this.foodsArr);
       this.naturesArr = this.sortArrayByOrder(
         localnaturesArr,
         this.monsterData.nature.replace(/\[|\]/g, '')
@@ -123,6 +126,7 @@ export default {
         locallocationsArr,
         this.monsterData.found_in.replace(/\[|\]/g, '')
       );
+      console.log('locationsArr');
       console.log(this.locationsArr);
       this.locationsArr.forEach(obj => {
         obj.name = JSON.parse(obj.name);
