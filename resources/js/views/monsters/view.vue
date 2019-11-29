@@ -1,17 +1,24 @@
 <template>
   <div class="app-container">
-    <el-row>
+    <el-row style="display: flex; align-items: center;">
       <el-col :span="24">
-        <h1>Monster {{ monsterData.name.en }}'s Details</h1>
+        <h1 style="display: inline-block;">{{ $t('ViewMonster.title', {name: monsterData.name[language]}) }}</h1>
+        <!-- <h1 style="display: inline-block;">Monster {{ monsterData.name.en }}'s Details</h1> -->
+      </el-col>
+      <el-col>
+        <el-radio-group v-model="language" style="float: right;" size="mini">
+          <el-radio-button label="en">English</el-radio-button>
+          <el-radio-button label="ja">Japanese</el-radio-button>
+        </el-radio-group>
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="8">
         <el-row>
-          <details-card :monster-data="monsterData" />
+          <details-card :monster-data="monsterData" :language="language" />
         </el-row>
         <el-row style="margin-top: 1rem">
-          <stats-card :monster-data="monsterData" />
+          <stats-card :monster-data="monsterData" :language="language" />
         </el-row>
       </el-col>
       <el-col :span="16">
@@ -21,6 +28,7 @@
           :fav-foods="foodsArr"
           :natures="naturesArr"
           :locations="locationsArr"
+          :language="language"
         />
         <el-card class="actions">
           <el-row>
@@ -44,6 +52,7 @@ import StatsCard from './components/StatsCard';
 import OtherDetails from './components/OtherDetails';
 const MonsterResource = new Resource('monsters');
 import axios from 'axios';
+import local from './local.js';
 
 export default {
   name: 'ViewMonster',
@@ -60,18 +69,40 @@ export default {
         monsterArrayData: false,
         delete: false,
       },
-      language: {
-        detail: 'en',
-      },
+      // language: 'en',
       foodsArr: [],
       naturesArr: [],
       locationsArr: [],
     };
   },
+  computed: {
+    language: {
+      get() {
+        const appLang = this.$store.state.app.language;
+        if (appLang === 'ja') {
+          return 'ja';
+        } else if (appLang === 'en') {
+          return 'en';
+        } else {
+          return 'en';
+        }
+      },
+      set(lang) {
+        this.$i18n.locale = lang;
+        this.$store.dispatch('app/setLanguage', lang);
+      },
+    },
+  },
   async created() {
     await this.getMonsterData(this.$route.params.id);
-    console.log(this.monsterData);
     await this.getMonstersArrayData();
+    if (!this.$i18n.getLocaleMessage('en')['ViewMonster']) {
+      this.$i18n.mergeLocaleMessage('en', local.en);
+      this.$i18n.mergeLocaleMessage('ja', local.ja);
+      this.$i18n.mergeLocaleMessage('ru', local.ru);
+      this.$i18n.mergeLocaleMessage('vi', local.vi);
+      this.$i18n.mergeLocaleMessage('zh', local.zh);
+    }
   },
   methods: {
     async getMonsterData(id) {
@@ -116,8 +147,6 @@ export default {
         localfoodsArr,
         this.monsterData.fav_food.replace(/\[|\]/g, '')
       );
-      console.log('foodsArr');
-      console.log(this.foodsArr);
       this.naturesArr = this.sortArrayByOrder(
         localnaturesArr,
         this.monsterData.nature.replace(/\[|\]/g, '')
@@ -126,8 +155,6 @@ export default {
         locallocationsArr,
         this.monsterData.found_in.replace(/\[|\]/g, '')
       );
-      console.log('locationsArr');
-      console.log(this.locationsArr);
       this.locationsArr.forEach(obj => {
         obj.name = JSON.parse(obj.name);
       });

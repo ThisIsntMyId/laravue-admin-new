@@ -3,14 +3,14 @@
     <div slot="header" class="clearfix">
       <div class="header">
         <span>
-          <strong>Stats</strong>
+          <strong>{{ $t('ViewMonster.stats') }}</strong>
         </span>
       </div>
     </div>
     <el-row>
       <el-col :span="12" class="stats-container">
         <el-row>
-          <strong>Health</strong>
+          <strong>{{ $t('ViewMonster.health') }}</strong>
         </el-row>
         <el-row>
           <count-to
@@ -26,7 +26,7 @@
       </el-col>
       <el-col :span="12" class="stats-container">
         <el-row>
-          <strong>Energy</strong>
+          <strong>{{ $t('ViewMonster.energy') }}</strong>
         </el-row>
         <el-row>
           <count-to
@@ -57,10 +57,14 @@ export default {
         return {};
       },
     },
+    language: {
+      type: String,
+      default: 'en',
+    },
   },
   data() {
     return {
-      language: 'en',
+      // language: 'en',
     };
   },
 };

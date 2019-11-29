@@ -3,14 +3,14 @@
     <div slot="header" class="clearfix">
       <div class="header">
         <span>
-          <strong>Other Details</strong>
+          <strong>{{ $t('ViewMonster.otherDetails') }}</strong>
         </span>
       </div>
     </div>
     <el-col>
       <el-row class="info">
         <div class="title">
-          <strong>Favourite Food</strong>
+          <strong>{{ $t('ViewMonster.favouriteFood') }}</strong>
         </div>
         <div>
           <el-tag
@@ -22,7 +22,7 @@
       </el-row>
       <el-row class="info">
         <div class="title">
-          <strong>Nature</strong>
+          <strong>{{ $t('ViewMonster.nature') }}</strong>
         </div>
         <div>
           <el-tag
@@ -34,18 +34,18 @@
       </el-row>
       <el-row class="info">
         <div class="title">
-          <strong>Found In</strong>
-          <el-radio-group v-model="language" style="float: right;" size="mini">
+          <strong>{{ $t('ViewMonster.foundIn') }}</strong>
+          <!-- <el-radio-group v-model="language" style="float: right;" size="mini">
             <el-radio-button label="en">English</el-radio-button>
             <el-radio-button label="ja">Japanese</el-radio-button>
-          </el-radio-group>
+          </el-radio-group>-->
         </div>
         <div>
           <el-tag
             v-for="location in locations"
             :key="location.id"
             :type="getRandomTagType(location.id)"
-          >{{ location.id }} | {{ language=='en'? location.name.en : location.name.ja }}</el-tag>
+          >{{ location.id }} | {{ location.name[language] }}</el-tag>
         </div>
       </el-row>
     </el-col>
@@ -74,10 +74,14 @@ export default {
         return [];
       },
     },
+    language: {
+      type: String,
+      default: 'en',
+    },
   },
   data() {
     return {
-      language: 'en',
+      // language: 'en',
     };
   },
   created() {

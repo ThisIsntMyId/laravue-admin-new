@@ -3,27 +3,27 @@
     <div slot="header" class="clearfix">
       <div class="header">
         <span>
-          <strong>Details</strong>
+          <strong>{{ $t('ViewMonster.details') }}</strong>
         </span>
-        <el-radio-group v-model="language" style="float: right;" size="mini">
+        <!-- <el-radio-group v-model="language" style="float: right;" size="mini">
           <el-radio-button label="en">English</el-radio-button>
           <el-radio-button label="ja">Japanese</el-radio-button>
-        </el-radio-group>
+        </el-radio-group>-->
       </div>
     </div>
     <el-row>
       <el-col :span="18">
         <div class="detail">
           <el-row>
-            <strong>Name</strong>
+            <strong>{{ $t('ViewMonster.name') }}</strong>
           </el-row>
-          <el-row>{{ language == 'en' ? monsterData.name.en : monsterData.name.ja }}</el-row>
+          <el-row>{{ monsterData.name[language] }}</el-row>
         </div>
         <div class="detail">
           <el-row>
-            <strong>Description</strong>
+            <strong>{{ $t('ViewMonster.description') }}</strong>
           </el-row>
-          <el-row>{{ language == 'en' ? monsterData.description.en : monsterData.description.ja }}</el-row>
+          <el-row>{{ monsterData.description[language] }}</el-row>
         </div>
       </el-col>
       <el-col :span="6">
@@ -48,10 +48,14 @@ export default {
         return {};
       },
     },
+    language: {
+      type: String,
+      default: 'en',
+    },
   },
   data() {
     return {
-      language: 'en',
+      // language: 'en',
     };
   },
 };
