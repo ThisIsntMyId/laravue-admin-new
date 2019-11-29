@@ -167,7 +167,7 @@ export const constantRoutes = [
       {
         path: '/monsters/create',
         component: () => import('@/views/monsters/createOrEdit'),
-        name: 'Add Monster',
+        // name: 'Add Monster', //? for these view to not to show up in tags
         meta: { title: 'Add Monster', icon: 'add-monster', noCache: true },
       },
       {
@@ -180,7 +180,7 @@ export const constantRoutes = [
       {
         path: '/monsters/edit/:id',
         component: () => import('@/views/monsters/createOrEdit.vue'),
-        name: 'Edit Monster',
+        // name: 'Edit Monster', //? for these view to not to show up in tags
         hidden: true,
         meta: { title: 'Edit Monster', noCache: true },
       },

@@ -15,7 +15,7 @@ class LocationController extends Controller
     public function index(Request $request)
     {
         if ($request->query('ids')) {
-            return Location::whereIn('id', json_decode('['. $request->query('ids') .']'))->get();
+            return Location::whereIn('id', json_decode($request->query('ids')))->get();
         }
 
         // limiting

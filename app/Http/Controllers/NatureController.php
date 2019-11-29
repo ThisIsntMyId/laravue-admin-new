@@ -15,7 +15,7 @@ class NatureController extends Controller
     public function index(Request $request)
     {
         if ($request->query('ids')) {
-            return Nature::whereIn('id', json_decode('['. $request->query('ids') .']'))->get();
+            return Nature::whereIn('id', json_decode($request->query('ids')))->get();
         }
         
         // limiting

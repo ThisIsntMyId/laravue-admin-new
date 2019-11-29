@@ -16,9 +16,9 @@ class CreateMonstersTable extends Migration
         Schema::create('monsters', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('name');                 //multilang
-            $table->string('japanese_name');
+            // $table->string('japanese_name');
             $table->text('description');          //miltilang
-            $table->text('japanese_description');
+            // $table->text('japanese_description');
             $table->string('fav_food');             //multiselect                      => comes from food table
             $table->string('nature');               //multiselect dragselect           => comes from nature table
                                                     // => the first and the last values represets most and least accurate natures exhibit by monster
@@ -30,7 +30,8 @@ class CreateMonstersTable extends Migration
         });
 
         // Full Text Index
-        DB::statement('ALTER TABLE monsters ADD FULLTEXT fulltextsearch (name, japanese_name, description, japanese_description)');
+        // DB::statement('ALTER TABLE monsters ADD FULLTEXT fulltextsearch (name, japanese_name, description, japanese_description)');
+        DB::statement('ALTER TABLE monsters ADD FULLTEXT fulltextsearch (name, description)');
     }
 
     /**

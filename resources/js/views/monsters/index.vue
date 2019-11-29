@@ -13,10 +13,10 @@
       border
       height="545px"
     >
-      <el-table-column v-if="language==='en'" prop="name" label="Name" />
-      <el-table-column v-else prop="japanese_name" label="Japanese Name" />
-      <el-table-column v-if="language==='en'" prop="description" label="Description" />
-      <el-table-column v-else prop="japanese_description" label="Japanese Description" />
+      <el-table-column v-if="language==='en'" prop="name.en" label="Name" />
+      <el-table-column v-else prop="name.ja" label="Japanese Name" />
+      <el-table-column v-if="language==='en'" prop="description.en" label="Description" />
+      <el-table-column v-else prop="description.ja" label="Japanese Description" />
       <el-table-column prop="health" label="Health" />
       <el-table-column prop="energy" label="Energy" />
       <!-- <el-table-column prop="fav_food" label="Favourite Food" /> -->
@@ -88,7 +88,10 @@ export default {
       // methods to get monster data and set pagination
       const data = await MonsterResource.list(query);
       this.monstersData = data.data;
-      console.log(this.monstersData);
+      this.monstersData.forEach(data => {
+        data.name = JSON.parse(data.name);
+        data.description = JSON.parse(data.description.replace('\n', '\\n'));
+      });
       // TODO: Remember to clean this
       this.paginationDetails.totalCards = parseInt(data.total);
       this.paginationDetails.currentPage = parseInt(data.current_page);

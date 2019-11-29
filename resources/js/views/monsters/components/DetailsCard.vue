@@ -17,13 +17,13 @@
           <el-row>
             <strong>Name</strong>
           </el-row>
-          <el-row>{{ language == 'en' ? monsterData.name : monsterData.japanese_name }}</el-row>
+          <el-row>{{ language == 'en' ? monsterData.name.en : monsterData.name.ja }}</el-row>
         </div>
         <div class="detail">
           <el-row>
             <strong>Description</strong>
           </el-row>
-          <el-row>{{ language == 'en' ? monsterData.description : monsterData.japanese_description }}</el-row>
+          <el-row>{{ language == 'en' ? monsterData.description.en : monsterData.description.ja }}</el-row>
         </div>
       </el-col>
       <el-col :span="6">

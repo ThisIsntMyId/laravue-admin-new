@@ -45,7 +45,7 @@
             v-for="location in locations"
             :key="location.id"
             :type="getRandomTagType(location.id)"
-          >{{ location.id }} | {{ language=='en'? location.name : location.japanese_name }}</el-tag>
+          >{{ location.id }} | {{ language=='en'? location.name.en : location.name.ja }}</el-tag>
         </div>
       </el-row>
     </el-col>
@@ -79,6 +79,11 @@ export default {
     return {
       language: 'en',
     };
+  },
+  created() {
+    console.log(this.favFoods);
+    console.log(this.natures);
+    console.log(this.locations);
   },
   methods: {
     getRandomTagType(number) {

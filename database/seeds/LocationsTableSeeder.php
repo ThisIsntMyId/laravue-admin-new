@@ -32,7 +32,8 @@ class LocationsTableSeeder extends Seeder
 
         foreach($locations as $n => $jn)
         {
-            Location::create(['name' => $n, 'japanese_name' => $jn]);
+            // Location::create(['name' => $n, 'japanese_name' => $jn]);
+            Location::create(['name' => "{\"en\": \"$n\", \"ja\": \"$jn\"}"]);
         }
     }
 }

@@ -16,40 +16,74 @@
                   <span>
                     <strong>Details</strong>
                   </span>
-                  <el-radio-group v-model="language.details" style="float: right;" size="small">
-                    <el-radio-button label="en">En</el-radio-button>
-                    <el-radio-button label="ja">Ja</el-radio-button>
-                  </el-radio-group>
                 </div>
               </div>
               <el-row>
                 <el-col :span="18">
-                  <div v-show="language.details == 'en'">
-                    <el-form-item class="details-field" prop="name">
+                  <div>
+                    <el-form-item
+                      v-show="language.name == 'en'"
+                      class="details-field"
+                      prop="name.en"
+                    >
                       <el-row>
                         <strong>Name</strong>
+                        <el-radio-group v-model="language.name" style="float: right;" size="small">
+                          <el-radio-button label="en">En</el-radio-button>
+                          <el-radio-button label="ja">Ja</el-radio-button>
+                        </el-radio-group>
                       </el-row>
-                      <el-input v-model="formData.name" />
+                      <el-input v-model="formData.name.en" />
                     </el-form-item>
-                    <el-form-item class="details-field" prop="description">
-                      <el-row>
-                        <strong>Description</strong>
-                      </el-row>
-                      <el-input v-model="formData.description" type="textarea" />
-                    </el-form-item>
-                  </div>
-                  <div v-show="language.details == 'ja'">
-                    <el-form-item class="details-field" prop="japanese_name">
+                    <el-form-item
+                      v-show="language.name == 'ja'"
+                      class="details-field"
+                      prop="name.ja"
+                    >
                       <el-row>
                         <strong>Japanese Name</strong>
+                        <el-radio-group v-model="language.name" style="float: right;" size="small">
+                          <el-radio-button label="en">En</el-radio-button>
+                          <el-radio-button label="ja">Ja</el-radio-button>
+                        </el-radio-group>
                       </el-row>
-                      <el-input v-model="formData.japanese_name" />
+                      <el-input v-model="formData.name.ja" />
                     </el-form-item>
-                    <el-form-item class="details-field" prop="japanese_description">
+                    <el-form-item
+                      v-show="language.description == 'en'"
+                      class="details-field"
+                      prop="description.en"
+                    >
+                      <el-row>
+                        <strong>Description</strong>
+                        <el-radio-group
+                          v-model="language.description"
+                          style="float: right;"
+                          size="small"
+                        >
+                          <el-radio-button label="en">En</el-radio-button>
+                          <el-radio-button label="ja">Ja</el-radio-button>
+                        </el-radio-group>
+                      </el-row>
+                      <el-input v-model="formData.description.en" type="textarea" />
+                    </el-form-item>
+                    <el-form-item
+                      v-show="language.description == 'ja'"
+                      class="details-field"
+                      prop="description.ja"
+                    >
                       <el-row>
                         <strong>Japanese Description</strong>
+                        <el-radio-group
+                          v-model="language.description"
+                          style="float: right;"
+                          size="small"
+                        >
+                          <el-radio-button label="en">En</el-radio-button>
+                          <el-radio-button label="ja">Ja</el-radio-button>
+                        </el-radio-group>
                       </el-row>
-                      <el-input v-model="formData.japanese_description" type="textarea" />
+                      <el-input v-model="formData.description.ja" type="textarea" />
                     </el-form-item>
                   </div>
                 </el-col>
@@ -185,7 +219,7 @@
                       <el-option
                         v-for="item in locationsArr"
                         :key="item.id"
-                        :label="language.location == 'en' ? item.name : item.japanese_name"
+                        :label="language.location == 'en' ? item.name.en : item.name.ja"
                         :value="item.id"
                       />
                     </el-drag-select>
@@ -259,14 +293,19 @@ export default {
 
     return {
       language: {
-        details: 'en',
+        name: 'en',
+        description: 'en',
         location: 'en',
       },
       formData: {
-        name: '',
-        japanese_name: '',
-        description: '',
-        japanese_description: '',
+        name: {
+          en: '',
+          ja: '',
+        },
+        description: {
+          en: '',
+          ja: '',
+        },
         health: '',
         energy: '',
         fav_food: [],
@@ -284,14 +323,14 @@ export default {
         delete: false,
       },
       validationRules: {
-        name: [
+        'name.en': [
           {
             required: true,
             message: 'Please enter name of monster',
             trigger: 'blur',
           },
         ],
-        japanese_name: [
+        'name.ja': [
           {
             required: true,
             message: 'Please enter japanese name of monster',
@@ -320,9 +359,10 @@ export default {
           console.log(dataToBeSent);
           axios
             .post('http://127.0.0.1:8000/api/monsters', dataToBeSent)
-            .then(() => {
+            .then(response => {
               this.$message.success('Monster added successfully.');
-              this.initializeMonsterData(this.$route.params.id);
+
+              this.$router.push(`/monsters/view/${response.data.id}`);
               this.loading.formSubmit = false;
             })
             .catch(() => {
@@ -332,8 +372,8 @@ export default {
               this.loading.formSubmit = false;
             });
         } else {
-          if (this.formData.name && this.formData.japanese_name === '') {
-            this.language.details = 'ja';
+          if (this.formData.name.en && this.formData.name.ja === '') {
+            this.language.name = 'ja';
           }
           this.$message.error(
             'There are some erors in your form. Please Fix them.'
@@ -356,6 +396,7 @@ export default {
               this.$message.success('Monster updated successfully.');
               this.resetForm();
               this.loading.formSubmit = false;
+              this.$router.push(`/monsters/view/${this.$route.params.id}`);
             })
             .catch(() => {
               this.$message.error(
@@ -364,8 +405,8 @@ export default {
               this.loading.formSubmit = false;
             });
         } else {
-          if (this.formData.name && this.formData.japanese_name === '') {
-            this.language.details = 'ja';
+          if (this.formData.name.en && this.formData.name.ja === '') {
+            this.language.name = 'ja';
           }
           this.$message.error(
             'There are some erors in your form. Please Fix them.'
@@ -383,9 +424,12 @@ export default {
     },
     prepareFormData(data) {
       const newData = Object.assign({}, data);
-      newData.fav_food = newData.fav_food.join(',');
-      newData.nature = newData.nature.join(',');
-      newData.found_in = newData.found_in.join(',');
+      newData.name = JSON.stringify(newData.name);
+      newData.description = JSON.stringify(newData.description);
+      newData.fav_food = JSON.stringify(newData.fav_food);
+      newData.nature = JSON.stringify(newData.nature);
+      newData.found_in = JSON.stringify(newData.found_in);
+      console.log(newData);
       return newData;
     },
     async initializeMonsterData(id) {
@@ -399,12 +443,24 @@ export default {
       const locations = (await axios.get(
         `http://127.0.0.1:8000/api/locations?ids=${monsterData.found_in}`
       )).data;
-      monsterData.fav_food = JSON.parse(`[${monsterData.fav_food}]`);
-      monsterData.nature = JSON.parse(`[${monsterData.nature}]`);
-      monsterData.found_in = JSON.parse(`[${monsterData.found_in}]`);
+      monsterData.fav_food = JSON.parse(monsterData.fav_food);
+      monsterData.nature = JSON.parse(monsterData.nature);
+      monsterData.found_in = JSON.parse(monsterData.found_in);
+      this.formData = monsterData;
+      // this.formData.fav_food =
+      this.formData.fav_food = foods.map(food => food.id);
+      this.formData.found_in = locations.map(location => location.id);
       this.foodsArr = foods;
       this.locationsArr = locations;
-      this.formData = monsterData;
+      console.log(this.formData);
+      console.log(monsterData);
+      this.formData.name = JSON.parse(this.formData.name);
+      this.formData.description = JSON.parse(
+        this.formData.description.replace('\n', '\\n')
+      );
+      this.locationsArr.forEach(obj => {
+        obj.name = JSON.parse(obj.name);
+      });
       this.loading.monsterData = false;
     },
     async remoteMethod(query) {
@@ -430,6 +486,10 @@ export default {
         this.locationsArr = (await axios.post(
           `http://127.0.0.1:8000/api/locations/search?q=${query}`
         )).data;
+        this.locationsArr.forEach(obj => {
+          obj.name = JSON.parse(obj.name);
+        });
+        console.log(this.locationsArr);
       } else {
         this.locationsArr = [];
       }

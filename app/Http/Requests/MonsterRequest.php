@@ -28,32 +28,32 @@ class MonsterRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'japanese_name' => 'required',
+            // 'japanese_name' => 'required',
             'description' => 'nullable',
-            'japanese_description' => 'nullable',
+            // 'japanese_description' => 'nullable',
             'fav_food' => ['required', function ($attribute, $value, $fail) {
-                $ids = explode(',', $value);
+                $ids = json_decode($value);
                 foreach ($ids as $id) {
                     if (!(Food::where('id', $id)->exists())) {
-                        $fail('Food with id ' . $attribute . ' is not present in db');
+                        $fail('Food with id ' . $value . ' is not present in db');
                     }
                 }
             }],
             'nature' => ['required', function ($attribute, $value, $fail) {
-                $ids = explode(',', $value);
+                $ids = json_decode($value);
                 foreach ($ids as $id) {
                     if (!(Nature::where('id', $id)->exists())) {
-                        $fail('Nature with id ' . $attribute . ' is not present in db');
+                        $fail('Nature with id ' . $value . ' is not present in db');
                     }
                 }
             }],
             'health' => 'required|integer|max:1000|min:0',
             'energy' => 'required|integer|max:1000|min:0',
             'found_in' => ['required', function ($attribute, $value, $fail) {
-                $ids = explode(',', $value);
+                $ids = json_decode($value);
                 foreach ($ids as $id) {
                     if (!(Location::where('id', $id)->exists())) {
-                        $fail('Location with id ' . $attribute . ' is not present in db');
+                        $fail('Location with id ' . $value . ' is not present in db');
                     }
                 }
             }],
